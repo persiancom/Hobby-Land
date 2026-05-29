@@ -57,11 +57,123 @@
             display: block;
         }
 
+        /* پیامرسان بزرگ شبیه تلگرام */
+        .messenger-container {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 32px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 180, 70, 0.3);
+        }
+        
+        .messenger-header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 18px 24px;
+            border-bottom: 2px solid #ffb347;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .messenger-header h1 {
+            color: #ffb347;
+            font-size: 1.6rem;
+            margin: 0;
+        }
+        
+        .messenger-header span {
+            font-size: 2rem;
+        }
+        
+        .messenger-body {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.8);
+        }
+        
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            word-wrap: break-word;
+        }
+        
+        .message-bubble.sent {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-bubble.received {
+            background: #2d3748;
+            color: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-sender {
+            font-size: 0.7rem;
+            color: #ffb347;
+            margin-bottom: 3px;
+        }
+        
+        .message-time {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-align: left;
+            margin-top: 4px;
+        }
+        
+        .message-input-area {
+            display: flex;
+            padding: 12px 16px;
+            background: #0f172a;
+            border-top: 1px solid #334155;
+            gap: 10px;
+        }
+        
+        .message-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 28px;
+            border: 1px solid #ffb347;
+            background: #1e293b;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .message-input-area input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .message-input-area button {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            border: none;
+            padding: 0 24px;
+            border-radius: 28px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
-            padding: 20px;
+            padding: 20px 0;
         }
         
         .game-card {
@@ -200,32 +312,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .lights-wrapper {
-            position: relative;
-        }
-        
-        .light-bulb {
-            position: absolute;
-            width: 22px;
-            height: 26px;
-            border-radius: 50% 50% 40% 40%;
-            transition: all 0.2s ease;
-            z-index: 5;
-            cursor: default;
-        }
-        
-        .light-bulb::before {
-            content: "";
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: #8B4513;
-            border-radius: 2px;
-        }
-
         .canvas-wrapper {
             display: flex;
             justify-content: center;
@@ -237,8 +323,6 @@
         canvas {
             display: block;
             margin: 0 auto;
-            border-radius: 18px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
             cursor: crosshair;
             background-color: white;
             width: 100%;
@@ -246,9 +330,12 @@
             touch-action: none;
         }
         
+        /* حاشیه طلایی و تریم دار برای بوم نقاشی */
         #drawCanvas {
             aspect-ratio: 1400/800;
             min-height: 55vh;
+            border-radius: 20px;
+            box-shadow: 0 0 0 4px #ffb347, 0 0 0 8px #ffd700, 0 10px 30px rgba(0,0,0,0.4);
         }
         
         #snakeCanvas {
@@ -257,6 +344,8 @@
             max-width: 750px;
             width: 100%;
             margin: 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
 
         .toolbar {
@@ -626,7 +715,6 @@
             font-weight: bold;
         }
 
-        /* فوتبال استارز */
         .football-container {
             background: rgba(26, 38, 50, 0.75);
             backdrop-filter: blur(12px);
@@ -709,7 +797,6 @@
             opacity: 1;
         }
         
-        /* بازی فضایی پیشرفته */
         .space-container {
             background: linear-gradient(180deg, #0a0a2a 0%, #1a1a3a 100%);
             border-radius: 32px;
@@ -883,7 +970,7 @@
             color: white;
         }
         
-        /* کادر چت */
+        /* کادر چت ساده در صفحه نقاشی */
         .chat-box {
             margin-top: 15px;
             background: rgba(0,0,0,0.6);
@@ -928,7 +1015,6 @@
         }
         
         @media (max-width: 768px) {
-            .light-bulb { width: 14px; height: 18px; }
             .game-title { font-size: 1.4rem; }
             .game-emoji { font-size: 55px; }
             #snakeCanvas { max-width: 95%; }
@@ -939,6 +1025,8 @@
             .score-board { font-size: 1.2rem; gap: 20px; }
             .goal-alert { font-size: 1.2rem; padding: 10px 25px; top: 35%; }
             .space-stats { font-size: 0.9rem; gap: 15px; }
+            .messenger-body { height: 350px; }
+            .messenger-header h1 { font-size: 1.2rem; }
         }
     </style>
     <!-- Firebase SDK ها -->
@@ -968,6 +1056,24 @@
         <div class="user-name" id="gamesUserName">خوش آمدی</div>
         <button class="theme-btn" id="themeToggleBtnGames">☀️</button>
     </div>
+    
+    <!-- پیامرسان بزرگ شبیه تلگرام -->
+    <div class="messenger-container">
+        <div class="messenger-header">
+            <span>📨</span>
+            <h1>پیامرسان</h1>
+        </div>
+        <div class="messenger-body">
+            <div class="messages-area" id="messengerMessages">
+                <div style="color: #94a3b8; text-align: center; padding: 20px;">💬 پیام‌ها اینجا نمایش داده می‌شوند...</div>
+            </div>
+            <div class="message-input-area">
+                <input type="text" id="messengerInput" placeholder="پیام خود را بنویسید...">
+                <button id="sendMessengerBtn">📤 ارسال</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="games-grid" id="gamesGrid"></div>
     <div class="signature"><span>✨ کاری از Hamidreza ❤️ ✨</span></div>
 </div>
@@ -979,10 +1085,8 @@
         <button class="theme-btn" id="themeToggleBtnPainting">☀️</button>
     </div>
     <div class="painting-container">
-        <div class="lights-wrapper" id="lightsWrapper">
-            <div class="canvas-wrapper">
-                <canvas id="drawCanvas" width="1400" height="800"></canvas>
-            </div>
+        <div class="canvas-wrapper">
+            <canvas id="drawCanvas" width="1400" height="800"></canvas>
         </div>
         <div class="toolbar">
             <button id="openColorModalBtn" class="color-picker-btn">
@@ -1000,7 +1104,7 @@
         </div>
         <div class="status" id="toolStatus">🎨 ابزار: قلم</div>
         
-        <!-- کادر چت همزمان -->
+        <!-- کادر چت ساده در صفحه نقاشی -->
         <div class="chat-box">
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="پیام خود را بنویسید...">
@@ -1077,7 +1181,6 @@
     </div>
 </div>
 
-<!-- صفحه بازی فضایی پیشرفته -->
 <div class="page" id="spaceGamePage">
     <div class="game-header">
         <button class="back-btn" id="backFromSpaceBtn">← بازگشت به بازی‌ها</button>
@@ -1153,6 +1256,7 @@
     const database = firebase.database();
     const drawingRef = database.ref('drawing');
     const chatRef = database.ref('chat');
+    const messengerRef = database.ref('messenger');
     
     // ========== بقیه کدها ==========
     (function(){
@@ -1199,6 +1303,11 @@
             setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 400); }, 2000);
         }
         
+        function formatTime() {
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        }
+        
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             if (pageName === 'games') gamesPage.classList.add('active');
@@ -1230,10 +1339,34 @@
             });
         }
         
+        // ========== پیامرسان تلگرامی ==========
+        function addMessengerMessage(name, message) {
+            const messagesArea = document.getElementById('messengerMessages');
+            if(messagesArea.children.length === 1 && messagesArea.children[0].innerText.includes('پیام‌ها')) {
+                messagesArea.innerHTML = '';
+            }
+            const isOwn = (name === currentUserName);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-bubble ${isOwn ? 'sent' : 'received'}`;
+            messageDiv.innerHTML = `
+                <div class="message-sender">${name}</div>
+                <div>${message}</div>
+                <div class="message-time">${formatTime()}</div>
+            `;
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            if(messagesArea.children.length > 100) messagesArea.removeChild(messagesArea.children[0]);
+        }
+        
+        messengerRef.on('child_added', (snapshot) => {
+            const data = snapshot.val();
+            if(data && data.name && data.message) {
+                addMessengerMessage(data.name, data.message);
+            }
+        });
+        
         // ========== نقاشی همزمان با Firebase ==========
         let paintingInitialized = false;
-        let blinkInterval = null;
-        let allLamps = [];
         let canvas, ctx;
         let paintingEnabled = true;
         let isDrawing = false;
@@ -1241,10 +1374,6 @@
         let currentSize = 6;
         let eraserMode = false;
         let isRemoteUpdate = false;
-        
-        function createLightsWithBlink() { const wrapper = document.getElementById('lightsWrapper'); if(!wrapper) return; document.querySelectorAll('.light-bulb').forEach(l=>l.remove()); if(blinkInterval) clearInterval(blinkInterval); allLamps = []; const colors = ['#ff6666','#ffee66','#66ff66','#66ddff','#ff66ff','#ffaa66','#ff88cc','#88ffcc']; for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.top='-14px'; lamp.style.backgroundColor=colors[i%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.bottom='-14px'; lamp.style.backgroundColor=colors[(i+4)%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<12;i++){ let l=document.createElement('div'); l.className='light-bulb'; l.style.top=`calc(${(i/11)*100}% - 13px)`; l.style.left='-14px'; l.style.backgroundColor=colors[(i+6)%colors.length]; wrapper.appendChild(l); allLamps.push(l); let r=document.createElement('div'); r.className='light-bulb'; r.style.top=`calc(${(i/11)*100}% - 13px)`; r.style.right='-14px'; r.style.backgroundColor=colors[(i+8)%colors.length]; wrapper.appendChild(r); allLamps.push(r); } let step=0; blinkInterval=setInterval(()=>{ if(document.body.classList.contains('night-mode')) return; allLamps.forEach((l,idx)=>{ if((idx+step)%2===0) l.style.opacity='1'; else l.style.opacity='0.3'; }); step=1-step; },450); }
-        
-        function saveDrawingWithName() { try{ const temp=document.createElement('canvas'); temp.width=canvas.width; temp.height=canvas.height+80; const tctx=temp.getContext('2d'); tctx.fillStyle='#ffb347'; tctx.fillRect(0,0,temp.width,80); tctx.font='bold 32px "Segoe UI"'; tctx.fillStyle='#ffffff'; tctx.textAlign='center'; tctx.fillText(`✨ ${currentUserName} ✨`, temp.width/2, 48); tctx.drawImage(canvas,0,80); const link=document.createElement('a'); link.download=`نقاشی_${currentUserName}_${Date.now()}.png`; link.href=temp.toDataURL('image/png'); link.click(); return true; }catch(e){ return false; } }
         
         function sendDrawingData(data) {
             if(isRemoteUpdate) return;
@@ -1310,10 +1439,12 @@
             ctx.beginPath();
         }
         
+        function saveDrawingWithName() { try{ const temp=document.createElement('canvas'); temp.width=canvas.width; temp.height=canvas.height+80; const tctx=temp.getContext('2d'); tctx.fillStyle='#ffb347'; tctx.fillRect(0,0,temp.width,80); tctx.font='bold 32px "Segoe UI"'; tctx.fillStyle='#ffffff'; tctx.textAlign='center'; tctx.fillText(`✨ ${currentUserName} ✨`, temp.width/2, 48); tctx.drawImage(canvas,0,80); const link=document.createElement('a'); link.download=`نقاشی_${currentUserName}_${Date.now()}.png`; link.href=temp.toDataURL('image/png'); link.click(); return true; }catch(e){ return false; } }
+        
         function initPaintingGame() {
-            if(paintingInitialized){ createLightsWithBlink(); return; }
+            if(paintingInitialized) return;
             paintingInitialized=true;
-            canvas=document.getElementById('drawCanvas'); ctx=canvas.getContext('2d'); canvas.width=1400; canvas.height=800; ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.lineCap='round'; ctx.lineJoin='round'; createLightsWithBlink();
+            canvas=document.getElementById('drawCanvas'); ctx=canvas.getContext('2d'); canvas.width=1400; canvas.height=800; ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.lineCap='round'; ctx.lineJoin='round';
             document.getElementById('paintingUserName').innerHTML = currentUserName;
             document.getElementById('selectedColorDot').style.backgroundColor='#000000';
             
@@ -1332,9 +1463,8 @@
             document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); sendDrawingData({ type: 'clear' }); showMessage("بوم پاک شد!"); });
             document.getElementById('saveBtn').addEventListener('click',()=>{ if(saveDrawingWithName()) showMessage("نقاشی ذخیره شد! ✅"); else showMessage("خطا!",true); });
             
-            updateBrushRemote(); document.getElementById('toolStatus').innerHTML='🎨 ابزار: قلم ● همیشه فعال';
+            updateBrushRemote(); document.getElementById('toolStatus').innerHTML='🎨 ابزار: قلم';
             
-            // گوش دادن به تغییرات نقاشی از سایر کاربران
             drawingRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
                 if(!data) return;
@@ -1362,7 +1492,7 @@
                 isRemoteUpdate = false;
             });
             
-            // چت همزمان
+            // چت در صفحه نقاشی
             function addChatMessage(name, message) {
                 const chatDiv = document.getElementById('chatMessages');
                 if(chatDiv.children.length === 1 && chatDiv.children[0].innerText.includes('پیام‌ها')) {
@@ -2127,7 +2257,7 @@
             animate();
         }
         
-        // ========== بازی فضایی راه شیری ==========
+        // ========== بازی فضایی ==========
         let spaceInitialized = false;
         let spaceCanvas, spaceCtx;
         let spaceAnimationId = null;
@@ -2545,6 +2675,19 @@
         document.getElementById('downloadFamilyImageBtn').addEventListener('click', downloadFamilyAsImage);
         document.getElementById('closeGameOverBtn').addEventListener('click', () => {
             document.getElementById('gameOverMsg').classList.remove('show');
+        });
+        
+        // ارسال پیام در پیامرسان
+        document.getElementById('sendMessengerBtn').addEventListener('click', () => {
+            const input = document.getElementById('messengerInput');
+            const msg = input.value.trim();
+            if(msg === '') return;
+            messengerRef.push({ name: currentUserName, message: msg, timestamp: Date.now() });
+            input.value = '';
+        });
+        
+        document.getElementById('messengerInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') document.getElementById('sendMessengerBtn').click();
         });
         
         function checkLogin() {
