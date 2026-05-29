@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="touch-action" content="none">
+    <title>مجموعه بازی‌های آنلاین | Hamidreza</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 12px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+            transition: background 4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        @keyframes bgShift {
+            0% { background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%); }
+            25% { background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #1a2a3a 100%); }
+            50% { background: linear-gradient(135deg, #2d3e4a 0%, #1a2a3a 50%, #2d3e4a 100%); }
+            75% { background: linear-gradient(135deg, #34495e 0%, #2c3e50 50%, #34495e 100%); }
+            100% { background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%); }
+        }
+        
+        body {
+            animation: bgShift 20s ease infinite;
+        }
+
+        body.night-mode {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%) !important;
+            animation: none !important;
+        }
+
+        .page {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .game-card {
+            background: rgba(26, 38, 50, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 45px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 180, 70, 0.5);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffb347;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .game-emoji {
+            font-size: 75px;
+            margin-bottom: 15px;
+        }
+        
+        .game-title {
+            font-size: 1.9rem;
+            color: #ffb347;
+            margin-bottom: 0;
+        }
+        
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-box {
+            background: linear-gradient(135deg, #2c3e50, #1a2632);
+            border-radius: 40px;
+            padding: 40px 35px;
+            text-align: center;
+            border: 2px solid #ffb347;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .login-box h2 {
+            color: #ffb347;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 2px solid #ffb347;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            outline: none;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        .error-msg {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+            border-radius: 80px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-name {
+            color: #ffb347;
+            font-size: 1.2rem;
+        }
+        
+        .theme-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            border: none;
+            font-size: 1.4rem;
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        .painting-container {
+            background: rgba(26, 38, 50, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 12px 15px 15px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .lights-wrapper {
+            position: relative;
+        }
+        
+        .light-bulb {
+            position: absolute;
+            width: 22px;
+            height: 26px;
+            border-radius: 50% 50% 40% 40%;
+            transition: all 0.2s ease;
+            z-index: 5;
+            cursor: default;
+        }
+        
+        .light-bulb::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8B4513;
+            border-radius: 2px;
+        }
+
+        .canvas-wrapper {
+            display: flex;
+            justify-content: center;
+            background: rgba(15, 26, 36, 0.4);
+            border-radius: 24px;
+            padding: 6px;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            cursor: crosshair;
+            background-color: white;
+            width: 100%;
+            height: auto;
+            touch-action: none;
+        }
+        
+        #drawCanvas {
+            aspect-ratio: 1400/800;
+            min-height: 55vh;
+        }
+        
+        #snakeCanvas {
+            cursor: pointer;
+            aspect-ratio: 1/1;
+            max-width: 750px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+            background: rgba(0,0,0,0.45);
+            padding: 10px 16px;
+            border-radius: 60px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ecf0f1, #dfe6e9);
+            border: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .color-picker-btn {
+            background: linear-gradient(135deg, #4a4a4a, #2c2c2c);
+            color: white;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #000000;
+            border: 1px solid white;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(44, 62, 80, 0.9);
+            padding: 5px 16px;
+            border-radius: 40px;
+            color: white;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #ffffff;
+            background: #00000099;
+            padding: 5px 12px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 10px;
+            background: linear-gradient(135deg, rgba(30,42,58,0.8), rgba(15,23,34,0.8));
+            border-radius: 45px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 5px 20px;
+            border-bottom: 2px solid #ffb347;
+        }
+        
+        .signature span {
+            background: linear-gradient(135deg, #ffb347, #ffdd77);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .snake-container {
+            background: rgba(26, 38, 50, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .snake-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 60px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .score-box {
+            font-size: 1.5rem;
+            color: #ffb347;
+            font-weight: bold;
+        }
+        
+        .score-box span {
+            color: white;
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            font-size: 1.1rem;
+            padding: 10px 25px;
+        }
+        
+        .swipe-instruction {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .travel-chick {
+            position: fixed;
+            top: 50px;
+            right: -550px;
+            font-size: 40px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            padding: 12px 30px 12px 25px;
+            border-radius: 70px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            z-index: 200;
+            border: 2px solid #ffdf8c;
+            white-space: nowrap;
+            transition: right 8s linear;
+            pointer-events: none;
+            direction: rtl;
+        }
+        
+        .travel-chick span {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffecb3;
+        }
+        
+        .game-over-msg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px 50px;
+            border-radius: 50px;
+            text-align: center;
+            z-index: 1000;
+            border: 3px solid #ffb347;
+            display: none;
+        }
+        
+        .game-over-msg.show {
+            display: block;
+            animation: popIn 0.3s ease;
+        }
+        
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .color-modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .color-modal.active { display: flex; }
+        .color-panel {
+            background: #1e293bc9;
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 20px;
+            width: 320px;
+            border: 1px solid gold;
+        }
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5,1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .modal-color {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .custom-picker input { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; }
+        
+        .floating-emoji {
+            position: fixed;
+            font-size: 1.6rem;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatEmoji 22s infinite linear;
+            filter: blur(0.5px);
+        }
+
+        @keyframes floatEmoji {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.08; }
+            90% { opacity: 0.08; }
+            100% { transform: translateY(-20vh) rotate(12deg); opacity: 0; }
+        }
+        
+        .memory-container {
+            background: rgba(26, 38, 50, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .memory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 60px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .memory-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .memory-stats div {
+            font-size: 1.2rem;
+            color: #ffb347;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        
+        .memory-stats span {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .memory-grid {
+            display: grid;
+            gap: 12px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+            justify-content: center;
+        }
+        
+        .memory-card {
+            aspect-ratio: 3 / 4;
+            background: linear-gradient(145deg, #2c3e50, #1a2632);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+            border: 2px solid rgba(255, 180, 70, 0.3);
+        }
+        
+        .memory-card::before {
+            content: "✨";
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+        
+        .memory-card::after {
+            content: "✨";
+            position: absolute;
+            bottom: 6px;
+            left: 8px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+        
+        .memory-card.flipped, .memory-card.matched {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            border: 2px solid #ffb347;
+        }
+        
+        .memory-card.matched {
+            background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+            opacity: 0.8;
+        }
+        
+        .memory-card:active {
+            transform: scale(0.97);
+        }
+        
+        .memory-card .card-emoji {
+            display: none;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .memory-card.flipped .card-emoji, .memory-card.matched .card-emoji {
+            display: block;
+        }
+        
+        .memory-card .card-back {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffb347;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .memory-card.flipped .card-back, .memory-card.matched .card-back {
+            display: none;
+        }
+        
+        .memory-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .next-level-btn {
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            color: white;
+            font-size: 1.1rem;
+            padding: 10px 25px;
+            display: none;
+        }
+        
+        .level-badge {
+            background: gold;
+            color: #1a1a2e;
+            border-radius: 40px;
+            padding: 5px 20px;
+            font-weight: bold;
+        }
+
+        /* فوتبال استارز */
+        .football-container {
+            background: rgba(26, 38, 50, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 20px;
+            text-align: center;
+        }
+        .football-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 60px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .score-board {
+            font-size: 1.8rem;
+            color: #ffb347;
+            font-weight: bold;
+            display: flex;
+            gap: 40px;
+        }
+        .football-canvas {
+            background-color: #1a5c1a;
+            border-radius: 20px;
+            display: block;
+            margin: 0 auto;
+            cursor: grab;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1100 / 700;
+            touch-action: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .football-canvas:active {
+            cursor: grabbing;
+        }
+        .power-bar-container {
+            width: 100%;
+            background: #333;
+            height: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .power-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ffb347, #ff8c00);
+            border-radius: 10px;
+            transition: width 0.02s linear;
+        }
+        
+        .goal-alert {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            padding: 15px 40px;
+            border-radius: 60px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            z-index: 300;
+            white-space: nowrap;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border: 2px solid gold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            font-family: monospace;
+            letter-spacing: 3px;
+        }
+        .goal-alert.show {
+            opacity: 1;
+        }
+        
+        /* بازی فضایی پیشرفته */
+        .space-container {
+            background: linear-gradient(180deg, #0a0a2a 0%, #1a1a3a 100%);
+            border-radius: 32px;
+            padding: 20px;
+            text-align: center;
+            min-height: 80vh;
+        }
+        .space-canvas {
+            background-color: #050510;
+            border-radius: 20px;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1000 / 700;
+            touch-action: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            cursor: none;
+        }
+        .space-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 60px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .space-stats {
+            display: flex;
+            gap: 30px;
+            font-size: 1.3rem;
+            color: #ffb347;
+            font-weight: bold;
+        }
+        .space-stats span {
+            color: white;
+            margin-right: 8px;
+        }
+        .level-badge-space {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            padding: 5px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .family-game-container {
+            background: rgba(26, 38, 50, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 25px;
+        }
+        .family-table-wrapper {
+            overflow-x: auto;
+            background: #0f1a1faa;
+            border-radius: 28px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .family-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-width: 400px;
+        }
+        .family-table th, .family-table td {
+            border: 2px solid #ffb347aa;
+            padding: 12px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .family-table th {
+            background: linear-gradient(135deg, #ffb347aa, #ff8c00aa);
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 0 #00000055;
+        }
+        .family-table td:first-child {
+            background: linear-gradient(135deg, #2c3e50cc, #1a2632cc);
+            font-weight: bold;
+            color: #ffb347;
+        }
+        .family-table tr:nth-child(even) td {
+            background-color: rgba(40, 55, 75, 0.5);
+        }
+        .family-table input {
+            background: rgba(255,255,240,0.2);
+            border: 1px solid #ffb347;
+            border-radius: 20px;
+            padding: 8px 10px;
+            color: white;
+            width: 100%;
+            min-width: 130px;
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .family-table input:focus {
+            outline: none;
+            border-color: #ffaa33;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 8px #ffb347;
+        }
+        .family-table input:disabled {
+            background: rgba(100,100,100,0.4);
+            color: #cccccc;
+            border-color: #888;
+        }
+        .family-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            font-weight: bold;
+            padding: 10px 24px;
+        }
+        .timer-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            border-radius: 80px;
+        }
+        .timer-box {
+            background: linear-gradient(135deg, #1e2a3a, #0f1a24);
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .timer-box span:first-child {
+            color: white;
+        }
+        .timer-display {
+            font-size: 2.2rem;
+            font-family: monospace;
+            background: #000000aa;
+            padding: 5px 18px;
+            border-radius: 50px;
+            color: #ffffff;
+            text-shadow: 0 0 6px #ffb347;
+            direction: ltr;
+            font-weight: bold;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 8px 28px;
+            border-radius: 60px;
+            cursor: pointer;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .light-bulb { width: 14px; height: 18px; }
+            .game-title { font-size: 1.4rem; }
+            .game-emoji { font-size: 55px; }
+            #snakeCanvas { max-width: 95%; }
+            .memory-card .card-emoji, .memory-card .card-back { font-size: 1.5rem; }
+            .memory-stats div { font-size: 0.8rem; }
+            .family-table input { padding: 5px 6px; min-width: 90px; font-size: 0.7rem; }
+            .family-table th, .family-table td { padding: 8px 4px; font-size: 0.7rem; }
+            .score-board { font-size: 1.2rem; gap: 20px; }
+            .goal-alert { font-size: 1.2rem; padding: 10px 25px; top: 35%; }
+            .space-stats { font-size: 0.9rem; gap: 15px; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+</head>
+<body>
+
+<div id="emojiBackground"></div>
+
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <div style="font-size: 50px;">🐣🎨</div>
+        <h2>به مجموعه بازی‌ها خوش آمدی</h2>
+        <div class="subtitle" style="color:#bbb;">اسمتون رو وارد کنید</div>
+        <input type="text" id="loginNameInput" class="login-input" autocomplete="off">
+        <button id="loginBtn" class="login-btn">✨ ورود ✨</button>
+        <div id="loginError" class="error-msg">❌ اسم اشتباه است</div>
+    </div>
+</div>
+
+<div class="page" id="gamesPage">
+    <div class="game-header">
+        <div></div>
+        <div class="user-name" id="gamesUserName">خوش آمدی</div>
+        <button class="theme-btn" id="themeToggleBtnGames">☀️</button>
+    </div>
+    <div class="games-grid" id="gamesGrid"></div>
+    <div class="signature"><span>✨ کاری از Hamidreza ❤️ ✨</span></div>
+</div>
+
+<div class="page" id="paintingGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromPaintingBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="paintingUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnPainting">☀️</button>
+    </div>
+    <div class="painting-container">
+        <div class="lights-wrapper" id="lightsWrapper">
+            <div class="canvas-wrapper">
+                <canvas id="drawCanvas" width="1400" height="800"></canvas>
+            </div>
+        </div>
+        <div class="toolbar">
+            <button id="openColorModalBtn" class="color-picker-btn">
+                <div class="color-dot" id="selectedColorDot"></div> 🎨 رنگ
+            </button>
+            <div class="range-group">
+                <span>✏️ ضخامت</span>
+                <input type="range" id="brushSize" min="1" max="60" value="6">
+                <span id="sizeDisplay" style="background:#000000aa; padding:2px 8px; border-radius:20px;">6</span>
+            </div>
+            <button id="clearBtn">🧽 پاک کردن همه</button>
+            <button id="eraserBtn">🧼 پاک کن</button>
+            <button id="pencilBtn">✏️ قلم</button>
+            <button id="saveBtn">💾 ذخیره</button>
+        </div>
+        <div class="status" id="toolStatus">🎨 ابزار: قلم</div>
+    </div>
+</div>
+
+<div class="page" id="snakeGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromSnakeBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="snakeUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnSnake">☀️</button>
+    </div>
+    <div class="snake-container">
+        <div class="snake-header">
+            <div class="score-box">🍎 امتیاز: <span id="snakeScore">0</span></div>
+            <div class="score-box">🏆 بهترین: <span id="highScore">0</span></div>
+            <button class="restart-btn" id="restartSnakeBtn">🔄 شروع مجدد</button>
+        </div>
+        <canvas id="snakeCanvas" class="snake-canvas" width="550" height="550"></canvas>
+        <div class="swipe-instruction">👆 برای حرکت مار، انگشتت رو روی صفحه بکش</div>
+    </div>
+</div>
+
+<div class="page" id="memoryGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromMemoryBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="memoryUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnMemory">☀️</button>
+    </div>
+    <div class="memory-container">
+        <div class="memory-header">
+            <div class="memory-stats">
+                <div>🌟 مرحله: <span id="currentLevel">1</span></div>
+                <div>🎯 جفت‌ها: <span id="pairsMatched">0</span> / <span id="totalPairs">0</span></div>
+                <div>🎲 تلاش‌ها: <span id="triesCount">0</span></div>
+                <div>⏱️ زمان این مرحله: <span id="levelTimer">0</span> ثانیه</div>
+            </div>
+            <div class="level-badge" id="levelBadge">مرحله 1</div>
+            <button id="resetMemoryBtn" class="restart-btn">🔄 شروع از اول</button>
+        </div>
+        <div id="memoryGrid" class="memory-grid"></div>
+        <div class="memory-controls">
+            <div class="status" id="memoryStatus">🎮 مرحله 1: کارت‌ها رو جفت کن!</div>
+            <button id="nextLevelBtn" class="next-level-btn">🎉 مرحله بعدی ➡️</button>
+        </div>
+    </div>
+</div>
+
+<div class="page" id="footballGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromFootballBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="footballUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnFootball">☀️</button>
+    </div>
+    <div class="football-container">
+        <div class="football-header">
+            <div class="score-board">
+                <span>⚽ شما: <span id="playerScore">0</span></span>
+                <span>🎗️ حریف: <span id="computerScore">0</span></span>
+            </div>
+            <button class="restart-btn" id="restartFootballBtn">🔄 شروع مجدد</button>
+        </div>
+        <canvas id="footballCanvas" class="football-canvas" width="1100" height="700"></canvas>
+        <div class="power-bar-container">
+            <div class="power-bar" id="powerBar"></div>
+        </div>
+        <div class="status" id="footballStatus">👇 نوبت شماست! روی مهره‌های خودت (⚡) بکش تا ضربه بزنی</div>
+    </div>
+</div>
+
+<!-- صفحه بازی فضایی پیشرفته -->
+<div class="page" id="spaceGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromSpaceBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="spaceUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnSpace">☀️</button>
+    </div>
+    <div class="space-container">
+        <div class="space-header">
+            <div class="space-stats">
+                <div>⭐ امتیاز: <span id="spaceScore">0</span></div>
+                <div>❤️ جان‌ها: <span id="spaceLives">3</span></div>
+                <div>🌠 سطح: <span id="spaceLevel">1</span></div>
+            </div>
+            <div class="level-badge-space" id="spaceLevelBadge">مرحله 1</div>
+            <button class="restart-btn" id="restartSpaceBtn">🔄 شروع مجدد</button>
+        </div>
+        <canvas id="spaceCanvas" class="space-canvas" width="1000" height="700"></canvas>
+        <div class="status" id="spaceStatus">🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!</div>
+    </div>
+</div>
+
+<div id="goalAlert" class="goal-alert">⚽ گل! ⚽</div>
+
+<div class="page" id="familyGamePage">
+    <div class="game-header">
+        <button class="back-btn" id="backFromFamilyBtn">← بازگشت به بازی‌ها</button>
+        <div class="user-name" id="familyUserName"></div>
+        <button class="theme-btn" id="themeToggleBtnFamily">☀️</button>
+    </div>
+    <div class="family-game-container">
+        <div class="timer-section">
+            <div class="timer-box">
+                <span>⏱️ زمان باقیمانده:</span>
+                <span class="timer-display" id="familyTimerDisplay">02:00</span>
+            </div>
+            <button class="start-btn" id="startFamilyGameBtn">🚀 شروع بازی اسم فامیل 🚀</button>
+        </div>
+        <div class="family-table-wrapper" id="familyTableForCapture">
+            <table class="family-table" id="familyTable">
+                <thead>
+                    <tr><th>عنوان</th><th>پاسخ شما</th></tr>
+                </thead>
+                <tbody id="familyTableBody"></tbody>
+            </table>
+        </div>
+        <div class="family-controls">
+            <button id="downloadFamilyImageBtn" class="download-btn">📸 ذخیره به صورت عکس</button>
+            <div class="status" id="familyStatus">⏳ روی شروع کلیک کن و تا ۲ دقیقه فرصت داری!</div>
+        </div>
+    </div>
+</div>
+
+<div id="gameOverMsg" class="game-over-msg">
+    <div style="font-size: 60px;">🏆</div>
+    <h2 style="color:#ffb347;" id="winnerTitle">بازی تمام شد!</h2>
+    <p style="color:white; font-size:1.2rem; margin:15px 0;">امتیاز نهایی: <span id="finalScore">0</span></p>
+    <button id="closeGameOverBtn" style="background:#ffb347; color:#1a1a2e; padding:12px 35px; font-size:1rem;">بازی مجدد</button>
+</div>
+
+<script>
+    (function(){
+        const GAMES = [
+            { id: "painting", name: "بوم نقاشی حرفه‌ای", emoji: "🎨", color: "#ffb347" },
+            { id: "snake", name: "مار گرسنه", emoji: "🐍", color: "#4CAF50" },
+            { id: "memory", name: "حافظه تصویری", emoji: "🧠", color: "#9C27B0" },
+            { id: "football", name: "فوتبال استارز", emoji: "⚽", color: "#2e7d32" },
+            { id: "space", name: "راه شیری", emoji: "🌌", color: "#9b59b6" },
+            { id: "family", name: "اسم فامیل", emoji: "📝", color: "#E91E63" }
+        ];
+        
+        let currentUserName = "";
+        
+        const loginOverlay = document.getElementById('loginOverlay');
+        const gamesPage = document.getElementById('gamesPage');
+        const paintingPage = document.getElementById('paintingGamePage');
+        const snakePage = document.getElementById('snakeGamePage');
+        const memoryPage = document.getElementById('memoryGamePage');
+        const familyPage = document.getElementById('familyGamePage');
+        const footballPage = document.getElementById('footballGamePage');
+        const spacePage = document.getElementById('spaceGamePage');
+        
+        const loginNameInput = document.getElementById('loginNameInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        
+        function showMessage(msg, isError = false) {
+            let div = document.createElement('div');
+            div.innerText = msg;
+            div.style.position = 'fixed';
+            div.style.bottom = '20px';
+            div.style.left = '50%';
+            div.style.transform = 'translateX(-50%)';
+            div.style.backgroundColor = isError ? '#c0392b' : '#2ecc71';
+            div.style.color = 'white';
+            div.style.padding = '8px 24px';
+            div.style.borderRadius = '50px';
+            div.style.zIndex = '3000';
+            div.style.fontWeight = 'bold';
+            div.style.backdropFilter = 'blur(8px)';
+            div.style.textAlign = 'center';
+            document.body.appendChild(div);
+            setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 400); }, 2000);
+        }
+        
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            if (pageName === 'games') gamesPage.classList.add('active');
+            else if (pageName === 'painting') { paintingPage.classList.add('active'); initPaintingGame(); }
+            else if (pageName === 'snake') { snakePage.classList.add('active'); initSnakeGame(); }
+            else if (pageName === 'memory') { memoryPage.classList.add('active'); initMemoryGame(); }
+            else if (pageName === 'football') { footballPage.classList.add('active'); initFootballGame(); }
+            else if (pageName === 'space') { spacePage.classList.add('active'); initSpaceGame(); }
+            else if (pageName === 'family') { familyPage.classList.add('active'); initFamilyGameUI(); }
+        }
+        
+        function buildGamesGrid() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = '';
+            GAMES.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.style.borderColor = game.color;
+                card.innerHTML = `<div class="game-emoji">${game.emoji}</div><div class="game-title" style="color:${game.color}">${game.name}</div>`;
+                card.addEventListener('click', () => {
+                    if (game.id === 'painting') { showPage('painting'); }
+                    else if (game.id === 'snake') { showPage('snake'); }
+                    else if (game.id === 'memory') { showPage('memory'); }
+                    else if (game.id === 'football') { showPage('football'); }
+                    else if (game.id === 'space') { showPage('space'); }
+                    else if (game.id === 'family') { showPage('family'); }
+                });
+                grid.appendChild(card);
+            });
+        }
+        
+        // ========== بازی فضایی راه شیری (پیشرفته، بدون ایموجی) ==========
+        let spaceInitialized = false;
+        let spaceCanvas, spaceCtx;
+        let spaceAnimationId = null;
+        let spaceScore = 0;
+        let spaceLives = 3;
+        let spaceLevel = 1;
+        let spaceGameActive = true;
+        
+        let player = { x: 500, y: 620, width: 36, height: 36 };
+        let bullets = [];
+        let enemies = [];
+        let stars = [];
+        let particles = [];
+        
+        let enemySpeed = 2.2;
+        let enemySpawnRate = 40;
+        let frameCount = 0;
+        let mouseX = 500, mouseY = 620;
+        
+        function initSpaceGame() {
+            if(spaceInitialized) {
+                resetSpaceGame();
+                return;
+            }
+            spaceInitialized = true;
+            spaceCanvas = document.getElementById('spaceCanvas');
+            spaceCtx = spaceCanvas.getContext('2d');
+            document.getElementById('spaceUserName').innerHTML = currentUserName;
+            
+            function getMousePos(e) {
+                const rect = spaceCanvas.getBoundingClientRect();
+                const scaleX = spaceCanvas.width / rect.width;
+                const scaleY = spaceCanvas.height / rect.height;
+                let clientX, clientY;
+                if(e.touches) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                    e.preventDefault();
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                let x = (clientX - rect.left) * scaleX;
+                let y = (clientY - rect.top) * scaleY;
+                x = Math.min(Math.max(20, x), spaceCanvas.width - 20);
+                y = Math.min(Math.max(20, y), spaceCanvas.height - 20);
+                return { x, y };
+            }
+            
+            function onPointerMove(e) {
+                if(!spaceGameActive) return;
+                const pos = getMousePos(e);
+                player.x = pos.x;
+                player.y = pos.y;
+            }
+            
+            function onShoot(e) {
+                if(!spaceGameActive) return;
+                bullets.push({ x: player.x, y: player.y - 25, width: 5, height: 15 });
+                e.preventDefault();
+            }
+            
+            spaceCanvas.addEventListener('mousemove', onPointerMove);
+            spaceCanvas.addEventListener('touchmove', onPointerMove, {passive: false});
+            spaceCanvas.addEventListener('click', onShoot);
+            spaceCanvas.addEventListener('touchstart', onShoot, {passive: false});
+            
+            document.getElementById('restartSpaceBtn').addEventListener('click', () => resetSpaceGame());
+            document.getElementById('closeGameOverBtn').addEventListener('click', () => { 
+                document.getElementById('gameOverMsg').classList.remove('show');
+                resetSpaceGame();
+            });
+            
+            createStars();
+            resetSpaceGame();
+        }
+        
+        function createStars() {
+            stars = [];
+            for(let i = 0; i < 150; i++) {
+                stars.push({ 
+                    x: Math.random() * 1000, 
+                    y: Math.random() * 700, 
+                    size: 1 + Math.random() * 2.5,
+                    alpha: 0.3 + Math.random() * 0.7,
+                    twinkle: 0.02 + Math.random() * 0.03
+                });
+            }
+        }
+        
+        function addExplosion(x, y) {
+            for(let i = 0; i < 15; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 1,
+                    size: 3 + Math.random() * 5,
+                    color: `hsl(${20 + Math.random() * 30}, 80%, 60%)`
+                });
+            }
+        }
+        
+        function spawnEnemy() {
+            let x = 30 + Math.random() * (spaceCanvas.width - 60);
+            let type = Math.floor(Math.random() * 3);
+            let size = 22 + Math.random() * 10;
+            let points = 5 + Math.floor(Math.random() * 4);
+            enemies.push({ 
+                x: x, y: -30, size: size, points: points,
+                rotation: 0, rotSpeed: (Math.random() - 0.5) * 0.04,
+                type: type
+            });
+        }
+        
+        function updateSpaceGame() {
+            if(!spaceGameActive) return;
+            
+            frameCount++;
+            
+            for(let s of stars) {
+                s.y += 0.8;
+                if(s.y > 700) s.y = 0;
+            }
+            
+            for(let i = 0; i < bullets.length; i++) {
+                bullets[i].y -= 9;
+                if(bullets[i].y < 0) bullets.splice(i,1);
+            }
+            
+            for(let i = 0; i < enemies.length; i++) {
+                enemies[i].y += enemySpeed;
+                enemies[i].rotation += enemies[i].rotSpeed;
+                if(enemies[i].y > spaceCanvas.height + 60) enemies.splice(i,1);
+            }
+            
+            for(let i = 0; i < bullets.length; i++) {
+                for(let j = 0; j < enemies.length; j++) {
+                    let dx = bullets[i].x - enemies[j].x;
+                    let dy = bullets[i].y - enemies[j].y;
+                    let dist = Math.hypot(dx, dy);
+                    if(dist < enemies[j].size) {
+                        bullets.splice(i,1);
+                        enemies.splice(j,1);
+                        spaceScore += 10;
+                        document.getElementById('spaceScore').innerText = spaceScore;
+                        addExplosion(enemies[j]?.x || 0, enemies[j]?.y || 0);
+                        break;
+                    }
+                }
+            }
+            
+            for(let i = 0; i < enemies.length; i++) {
+                let dx = player.x - enemies[i].x;
+                let dy = player.y - enemies[i].y;
+                let dist = Math.hypot(dx, dy);
+                if(dist < enemies[i].size + 18) {
+                    enemies.splice(i,1);
+                    spaceLives--;
+                    document.getElementById('spaceLives').innerText = spaceLives;
+                    addExplosion(player.x, player.y);
+                    if(spaceLives <= 0) {
+                        spaceGameActive = false;
+                        document.getElementById('winnerTitle').innerText = '💥 GAME OVER 💥';
+                        document.getElementById('finalScore').innerHTML = spaceScore;
+                        document.getElementById('gameOverMsg').classList.add('show');
+                        return;
+                    }
+                }
+            }
+            
+            for(let i = 0; i < particles.length; i++) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life -= 0.03;
+                if(particles[i].life <= 0) particles.splice(i,1);
+            }
+            
+            let newLevel = Math.floor(spaceScore / 200) + 1;
+            if(newLevel > spaceLevel) {
+                spaceLevel = newLevel;
+                document.getElementById('spaceLevel').innerText = spaceLevel;
+                document.getElementById('spaceLevelBadge').innerHTML = `مرحله ${spaceLevel}`;
+                enemySpeed = 2.2 + (spaceLevel - 1) * 0.35;
+                enemySpawnRate = Math.max(22, 40 - (spaceLevel - 1) * 2.5);
+                document.getElementById('spaceStatus').innerHTML = `🚀 مرحله ${spaceLevel}! سرعت شهاب‌ها افزایش یافت! 🚀`;
+                setTimeout(() => {
+                    if(spaceGameActive) document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
+                }, 2500);
+            }
+            
+            if(frameCount % enemySpawnRate === 0 && spaceGameActive && enemies.length < 18) {
+                spawnEnemy();
+            }
+        }
+        
+        function drawSpaceGame() {
+            if(!spaceCtx) return;
+            
+            const grad = spaceCtx.createLinearGradient(0, 0, 0, spaceCanvas.height);
+            grad.addColorStop(0, "#050520");
+            grad.addColorStop(0.5, "#0a0a35");
+            grad.addColorStop(1, "#150a25");
+            spaceCtx.fillStyle = grad;
+            spaceCtx.fillRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+            
+            for(let s of stars) {
+                spaceCtx.beginPath();
+                spaceCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                spaceCtx.fillStyle = `rgba(255, 230, 180, ${0.3 + Math.sin(Date.now() * s.twinkle) * 0.2})`;
+                spaceCtx.fill();
+            }
+            
+            for(let b of bullets) {
+                spaceCtx.fillStyle = '#ffff44';
+                spaceCtx.fillRect(b.x - 2, b.y, 4, 12);
+                spaceCtx.fillStyle = '#ffaa00';
+                spaceCtx.fillRect(b.x - 1.5, b.y + 5, 3, 10);
+            }
+            
+            for(let e of enemies) {
+                spaceCtx.save();
+                spaceCtx.translate(e.x, e.y);
+                spaceCtx.rotate(e.rotation);
+                spaceCtx.beginPath();
+                let angleStep = (Math.PI * 2) / e.points;
+                for(let i = 0; i < e.points; i++) {
+                    let angle = i * angleStep;
+                    let x1 = Math.cos(angle) * e.size;
+                    let y1 = Math.sin(angle) * e.size;
+                    if(i === 0) spaceCtx.moveTo(x1, y1);
+                    else spaceCtx.lineTo(x1, y1);
+                    let angle2 = angle + angleStep / 2;
+                    let x2 = Math.cos(angle2) * (e.size * 0.55);
+                    let y2 = Math.sin(angle2) * (e.size * 0.55);
+                    spaceCtx.lineTo(x2, y2);
+                }
+                spaceCtx.closePath();
+                const grad = spaceCtx.createRadialGradient(-5, -5, 5, 0, 0, e.size);
+                grad.addColorStop(0, "#c44");
+                grad.addColorStop(1, "#822");
+                spaceCtx.fillStyle = grad;
+                spaceCtx.fill();
+                spaceCtx.strokeStyle = "#ff8866";
+                spaceCtx.lineWidth = 1.5;
+                spaceCtx.stroke();
+                spaceCtx.restore();
+                
+                spaceCtx.beginPath();
+                spaceCtx.moveTo(e.x, e.y + e.size);
+                spaceCtx.lineTo(e.x, e.y + e.size + 10);
+                spaceCtx.strokeStyle = "rgba(255, 100, 50, 0.6)";
+                spaceCtx.lineWidth = 2;
+                spaceCtx.stroke();
+            }
+            
+            for(let p of particles) {
+                spaceCtx.fillStyle = p.color;
+                spaceCtx.beginPath();
+                spaceCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                spaceCtx.fill();
+            }
+            
+            spaceCtx.save();
+            spaceCtx.translate(player.x, player.y);
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(0, -22);
+            spaceCtx.lineTo(-16, 12);
+            spaceCtx.lineTo(-8, 6);
+            spaceCtx.lineTo(-8, 18);
+            spaceCtx.lineTo(0, 12);
+            spaceCtx.lineTo(8, 18);
+            spaceCtx.lineTo(8, 6);
+            spaceCtx.lineTo(16, 12);
+            spaceCtx.closePath();
+            const shipGrad = spaceCtx.createLinearGradient(-10, -10, 10, 15);
+            shipGrad.addColorStop(0, "#5bc0ff");
+            shipGrad.addColorStop(1, "#2d7fff");
+            spaceCtx.fillStyle = shipGrad;
+            spaceCtx.fill();
+            spaceCtx.fillStyle = "#aaffdd";
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(-8, -8);
+            spaceCtx.lineTo(0, -18);
+            spaceCtx.lineTo(8, -8);
+            spaceCtx.fill();
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(-4, 16);
+            spaceCtx.lineTo(0, 26);
+            spaceCtx.lineTo(4, 16);
+            spaceCtx.fillStyle = "#ff8844";
+            spaceCtx.fill();
+            spaceCtx.restore();
+            
+            spaceCtx.font = "12px monospace";
+            spaceCtx.fillStyle = "rgba(180, 200, 255, 0.7)";
+            spaceCtx.fillText(`🌠 ${Math.floor(enemySpeed * 10)}%`, spaceCanvas.width - 75, 45);
+        }
+        
+        function resetSpaceGame() {
+            spaceScore = 0;
+            spaceLives = 3;
+            spaceLevel = 1;
+            spaceGameActive = true;
+            bullets = [];
+            enemies = [];
+            particles = [];
+            player.x = spaceCanvas.width / 2;
+            player.y = spaceCanvas.height - 60;
+            enemySpeed = 2.2;
+            enemySpawnRate = 40;
+            frameCount = 0;
+            document.getElementById('spaceScore').innerText = spaceScore;
+            document.getElementById('spaceLives').innerText = spaceLives;
+            document.getElementById('spaceLevel').innerText = spaceLevel;
+            document.getElementById('spaceLevelBadge').innerHTML = 'مرحله 1';
+            document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
+            startSpaceLoop();
+        }
+        
+        function startSpaceLoop() {
+            function animate() {
+                updateSpaceGame();
+                drawSpaceGame();
+                spaceAnimationId = requestAnimationFrame(animate);
+            }
+            if(spaceAnimationId) cancelAnimationFrame(spaceAnimationId);
+            animate();
+        }
+        
+        // ========== بقیه بازی‌ها (کدهای کامل قبلی) ==========
+        // نقاشی
+        let paintingInitialized = false;
+        let blinkInterval = null;
+        let allLamps = [];
+        let canvas, ctx;
+        let paintingEnabled = true;
+        let isDrawing = false;
+        let currentColor = '#000000';
+        let currentSize = 6;
+        let eraserMode = false;
+        
+        function createLightsWithBlink() { const wrapper = document.getElementById('lightsWrapper'); if(!wrapper) return; document.querySelectorAll('.light-bulb').forEach(l=>l.remove()); if(blinkInterval) clearInterval(blinkInterval); allLamps = []; const colors = ['#ff6666','#ffee66','#66ff66','#66ddff','#ff66ff','#ffaa66','#ff88cc','#88ffcc']; for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.top='-14px'; lamp.style.backgroundColor=colors[i%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.bottom='-14px'; lamp.style.backgroundColor=colors[(i+4)%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<12;i++){ let l=document.createElement('div'); l.className='light-bulb'; l.style.top=`calc(${(i/11)*100}% - 13px)`; l.style.left='-14px'; l.style.backgroundColor=colors[(i+6)%colors.length]; wrapper.appendChild(l); allLamps.push(l); let r=document.createElement('div'); r.className='light-bulb'; r.style.top=`calc(${(i/11)*100}% - 13px)`; r.style.right='-14px'; r.style.backgroundColor=colors[(i+8)%colors.length]; wrapper.appendChild(r); allLamps.push(r); } let step=0; blinkInterval=setInterval(()=>{ if(document.body.classList.contains('night-mode')) return; allLamps.forEach((l,idx)=>{ if((idx+step)%2===0) l.style.opacity='1'; else l.style.opacity='0.3'; }); step=1-step; },450); }
+        function saveDrawingWithName() { try{ const temp=document.createElement('canvas'); temp.width=canvas.width; temp.height=canvas.height+80; const tctx=temp.getContext('2d'); tctx.fillStyle='#ffb347'; tctx.fillRect(0,0,temp.width,80); tctx.font='bold 32px "Segoe UI"'; tctx.fillStyle='#ffffff'; tctx.textAlign='center'; tctx.fillText(`✨ ${currentUserName} ✨`, temp.width/2, 48); tctx.drawImage(canvas,0,80); const link=document.createElement('a'); link.download=`نقاشی_${currentUserName}_${Date.now()}.png`; link.href=temp.toDataURL('image/png'); link.click(); return true; }catch(e){ return false; } }
+        function initPaintingGame() {
+            if(paintingInitialized){ createLightsWithBlink(); return; }
+            paintingInitialized=true;
+            canvas=document.getElementById('drawCanvas'); ctx=canvas.getContext('2d'); canvas.width=1400; canvas.height=800; ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.lineCap='round'; ctx.lineJoin='round'; createLightsWithBlink();
+            document.getElementById('paintingUserName').innerHTML = currentUserName;
+            document.getElementById('selectedColorDot').style.backgroundColor='#000000';
+            function getCoords(e){ const rect=canvas.getBoundingClientRect(); const sx=canvas.width/rect.width, sy=canvas.height/rect.height; let cx,cy; if(e.touches){ if(!e.touches.length) return null; cx=e.touches[0].clientX; cy=e.touches[0].clientY; }else{ cx=e.clientX; cy=e.clientY; } let x=(cx-rect.left)*sx, y=(cy-rect.top)*sy; x=Math.min(Math.max(0,x),canvas.width); y=Math.min(Math.max(0,y),canvas.height); return {x,y}; }
+            function updateBrush(){ if(eraserMode) ctx.strokeStyle='#FFFFFF'; else ctx.strokeStyle=currentColor; ctx.lineWidth=currentSize; }
+            function startDraw(e){ if(!paintingEnabled) return; isDrawing=true; const pos=getCoords(e); if(!pos) return; ctx.beginPath(); ctx.moveTo(pos.x,pos.y); ctx.lineTo(pos.x+0.5,pos.y+0.5); updateBrush(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x,pos.y); }
+            function drawMove(e){ if(!paintingEnabled||!isDrawing) return; e.preventDefault(); const pos=getCoords(e); if(!pos) return; updateBrush(); ctx.lineTo(pos.x,pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x,pos.y); }
+            function endDraw(){ isDrawing=false; ctx.beginPath(); }
+            canvas.addEventListener('mousedown',startDraw); canvas.addEventListener('mousemove',drawMove); canvas.addEventListener('mouseup',endDraw); canvas.addEventListener('mouseleave',endDraw);
+            canvas.addEventListener('touchstart',(e)=>{ e.preventDefault(); startDraw(e);}); canvas.addEventListener('touchmove',(e)=>{ e.preventDefault(); drawMove(e);}); canvas.addEventListener('touchend',endDraw);
+            const brushSlider=document.getElementById('brushSize'), sizeSpan=document.getElementById('sizeDisplay');
+            brushSlider.addEventListener('input',()=>{ currentSize=parseInt(brushSlider.value); sizeSpan.innerText=currentSize; updateBrush(); });
+            document.getElementById('eraserBtn').addEventListener('click',()=>{ eraserMode=true; updateBrush(); document.getElementById('toolStatus').innerHTML='🧼 پاک کن'; });
+            document.getElementById('pencilBtn').addEventListener('click',()=>{ eraserMode=false; updateBrush(); document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; });
+            document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); showMessage("بوم پاک شد!"); });
+            document.getElementById('saveBtn').addEventListener('click',()=>{ if(saveDrawingWithName()) showMessage("نقاشی ذخیره شد! ✅"); else showMessage("خطا!",true); });
+            updateBrush(); document.getElementById('toolStatus').innerHTML='🎨 ابزار: قلم ● همیشه فعال';
+            const modal=document.getElementById('colorModal');
+            if(!modal){
+                const newModal = document.createElement('div');
+                newModal.id='colorModal'; newModal.className='color-modal';
+                newModal.innerHTML = `<div class="color-panel"><h3 style="color:gold">انتخاب رنگ</h3><div class="color-grid">
+                <div class="modal-color" style="background:#000000"></div><div class="modal-color" style="background:#FF0000"></div><div class="modal-color" style="background:#00FF00"></div><div class="modal-color" style="background:#0000FF"></div><div class="modal-color" style="background:#FFFF00"></div>
+                <div class="modal-color" style="background:#FF00FF"></div><div class="modal-color" style="background:#00FFFF"></div><div class="modal-color" style="background:#FFA500"></div><div class="modal-color" style="background:#800080"></div><div class="modal-color" style="background:#A52A2A"></div>
+                <div class="modal-color" style="background:#FFC0CB"></div><div class="modal-color" style="background:#808080"></div><div class="modal-color" style="background:#FFFFFF; border:1px solid #aaa"></div><div class="modal-color" style="background:#964B00"></div><div class="modal-color" style="background:#00CED1"></div>
+                </div><div class="custom-picker"><label style="color:white">رنگ دلخواه: </label><input type="color" id="customColorPicker" value="#ffb347"></div><button id="closeModalBtn" style="margin-top:15px; background:gold">بستن</button></div>`;
+                document.body.appendChild(newModal);
+            }
+            const finalModal = document.getElementById('colorModal');
+            document.getElementById('openColorModalBtn').addEventListener('click',()=>finalModal.classList.add('active'));
+            document.getElementById('closeModalBtn').addEventListener('click',()=>finalModal.classList.remove('active'));
+            document.querySelectorAll('.modal-color').forEach(el=>{ el.addEventListener('click',()=>{ let rgb=window.getComputedStyle(el).backgroundColor.match(/\d+/g); if(rgb){ let hex="#"+((1<<24)+(parseInt(rgb[0])<<16)+(parseInt(rgb[1])<<8)+parseInt(rgb[2])).toString(16).slice(1); currentColor=hex; if(eraserMode) eraserMode=false; updateBrush(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; } finalModal.classList.remove('active'); }); });
+            document.getElementById('customColorPicker').addEventListener('input',(e)=>{ currentColor=e.target.value; if(eraserMode) eraserMode=false; updateBrush(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; finalModal.classList.remove('active'); });
+        }
+        
+        // ========== مار ==========
+        let snakeGameInitialized = false;
+        let snakeCanvas, snakeCtx;
+        let snakeGameLoop = null;
+        let snake = [{x: 10, y: 10}];
+        let snakeDirection = 'right';
+        let nextDirection = 'right';
+        let food = {x: 15, y: 10};
+        let bomb = null;
+        let bombTimeout = null;
+        let bombVisible = false;
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let gameRunning = true;
+        let isSnakeActive = false;
+        let currentSpeed = 200;
+        const gridSize = 22;
+        const cellSize = 25;
+        
+        function stopSnakeGameCompletely() {
+            isSnakeActive = false;
+            gameRunning = false;
+            if (snakeGameLoop) { clearInterval(snakeGameLoop); snakeGameLoop = null; }
+            if (bombTimeout) { clearTimeout(bombTimeout); bombTimeout = null; }
+        }
+        
+        function scheduleBomb() {
+            if (bombTimeout) clearTimeout(bombTimeout);
+            bombTimeout = setTimeout(() => {
+                if (!gameRunning || !isSnakeActive) return;
+                let emptyCells = [];
+                for(let i=0;i<gridSize;i++){
+                    for(let j=0;j<gridSize;j++){
+                        if(!snake.some(s=>s.x===i && s.y===j) && !(food.x===i && food.y===j)){
+                            emptyCells.push({x:i, y:j});
+                        }
+                    }
+                }
+                if(emptyCells.length>0){
+                    let rand = emptyCells[Math.floor(Math.random()*emptyCells.length)];
+                    bomb = rand;
+                    bombVisible = true;
+                    setTimeout(() => {
+                        bombVisible = false;
+                        bomb = null;
+                        if(gameRunning && isSnakeActive) scheduleBomb();
+                    }, 10000);
+                } else {
+                    scheduleBomb();
+                }
+            }, 20000);
+        }
+        
+        function initSnakeGame() {
+            if (snakeGameLoop) clearInterval(snakeGameLoop);
+            if (bombTimeout) clearTimeout(bombTimeout);
+            snake = [{x: Math.floor(gridSize/2), y: Math.floor(gridSize/2)}];
+            snakeDirection = 'right'; nextDirection = 'right';
+            score = 0; currentSpeed = 200; gameRunning = true; isSnakeActive = true;
+            bombVisible = false; bomb = null;
+            document.getElementById('snakeScore').innerHTML = score;
+            document.getElementById('highScore').innerHTML = highScore;
+            generateRandomFood();
+            scheduleBomb();
+            if (!snakeGameInitialized) {
+                snakeGameInitialized = true;
+                snakeCanvas = document.getElementById('snakeCanvas');
+                snakeCanvas.width = 550; snakeCanvas.height = 550;
+                snakeCtx = snakeCanvas.getContext('2d');
+                document.getElementById('snakeUserName').innerHTML = currentUserName;
+                let touchStartX=0, touchStartY=0, touchEndX=0, touchEndY=0;
+                snakeCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }, {passive:false});
+                snakeCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); const t=e.touches[0]; touchEndX=t.clientX; touchEndY=t.clientY; }, {passive:false});
+                snakeCanvas.addEventListener('touchend', (e) => {
+                    e.preventDefault(); const dx=touchEndX-touchStartX, dy=touchEndY-touchStartY;
+                    if(Math.abs(dx)<15 && Math.abs(dy)<15) return;
+                    if(Math.abs(dx)>Math.abs(dy)) dx>0 ? changeDirection('right') : changeDirection('left');
+                    else dy>0 ? changeDirection('down') : changeDirection('up');
+                });
+                document.getElementById('restartSnakeBtn').addEventListener('click', () => resetSnakeGame());
+            }
+            drawSnake();
+            snakeGameLoop = setInterval(updateSnakeGame, currentSpeed);
+        }
+        
+        function changeDirection(newDir) { if(!gameRunning) return; const opp={'up':'down','down':'up','left':'right','right':'left'}; if(opp[newDir] !== snakeDirection) nextDirection = newDir; }
+        function resetSnakeGame() { if(snakeGameLoop) clearInterval(snakeGameLoop); if(bombTimeout) clearTimeout(bombTimeout); snake=[{x:Math.floor(gridSize/2),y:Math.floor(gridSize/2)}]; snakeDirection='right'; nextDirection='right'; score=0; currentSpeed=200; gameRunning=true; isSnakeActive=true; document.getElementById('snakeScore').innerHTML=score; generateRandomFood(); bombVisible=false; bomb=null; scheduleBomb(); drawSnake(); snakeGameLoop=setInterval(updateSnakeGame,currentSpeed); }
+        function generateRandomFood() { do { food={x:Math.floor(Math.random()*gridSize), y:Math.floor(Math.random()*gridSize)}; } while(snake.some(s=>s.x===food.x && s.y===food.y) || (bomb && bomb.x===food.x && bomb.y===food.y)); }
+        function updateSnakeGame() {
+            if(!gameRunning || !isSnakeActive) return;
+            snakeDirection = nextDirection;
+            let newHead = {...snake[0]};
+            switch(snakeDirection) { case 'right': newHead.x++; break; case 'left': newHead.x--; break; case 'up': newHead.y--; break; case 'down': newHead.y++; break; }
+            if(newHead.x<0 || newHead.x>=gridSize || newHead.y<0 || newHead.y>=gridSize) { gameOverSnake(); return; }
+            if(bombVisible && bomb && newHead.x===bomb.x && newHead.y===bomb.y) { gameOverSnake(); return; }
+            const ateFood = (newHead.x===food.x && newHead.y===food.y);
+            if(ateFood) { snake.unshift(newHead); score++; document.getElementById('snakeScore').innerHTML=score; if(score>highScore){ highScore=score; localStorage.setItem('snakeHighScore',highScore); document.getElementById('highScore').innerHTML=highScore; showMessage(`🎉 رکورد جدید! ${currentUserName} عالی بود!`); } generateRandomFood(); }
+            else { snake.unshift(newHead); snake.pop(); }
+            if(snake.slice(1).some(s=>s.x===snake[0].x && s.y===snake[0].y)) { gameOverSnake(); return; }
+            drawSnake();
+        }
+        function drawSnake() { 
+            if(!snakeCtx) return; 
+            snakeCtx.fillStyle='#1a1a2e'; snakeCtx.fillRect(0,0,snakeCanvas.width,snakeCanvas.height); 
+            for(let i=0;i<=gridSize;i++){ snakeCtx.strokeStyle='#2a2a4e'; snakeCtx.beginPath(); snakeCtx.moveTo(i*cellSize,0); snakeCtx.lineTo(i*cellSize,snakeCanvas.height); snakeCtx.stroke(); snakeCtx.beginPath(); snakeCtx.moveTo(0,i*cellSize); snakeCtx.lineTo(snakeCanvas.width,i*cellSize); snakeCtx.stroke(); } 
+            snake.forEach((seg,idx)=>{ 
+                snakeCtx.fillStyle=idx===0?'#4CAF50':'#66BB6A'; 
+                snakeCtx.fillRect(seg.x*cellSize,seg.y*cellSize,cellSize-1,cellSize-1);
+                if(idx===0){
+                    snakeCtx.fillStyle='white';
+                    snakeCtx.beginPath();
+                    snakeCtx.arc(seg.x*cellSize+cellSize*0.7, seg.y*cellSize+cellSize*0.35, 3, 0, Math.PI*2);
+                    snakeCtx.fill();
+                    snakeCtx.fillStyle='black';
+                    snakeCtx.beginPath();
+                    snakeCtx.arc(seg.x*cellSize+cellSize*0.75, seg.y*cellSize+cellSize*0.35, 1.5, 0, Math.PI*2);
+                    snakeCtx.fill();
+                    snakeCtx.fillStyle='white';
+                    snakeCtx.beginPath();
+                    snakeCtx.arc(seg.x*cellSize+cellSize*0.3, seg.y*cellSize+cellSize*0.35, 3, 0, Math.PI*2);
+                    snakeCtx.fill();
+                    snakeCtx.fillStyle='black';
+                    snakeCtx.beginPath();
+                    snakeCtx.arc(seg.x*cellSize+cellSize*0.35, seg.y*cellSize+cellSize*0.35, 1.5, 0, Math.PI*2);
+                    snakeCtx.fill();
+                    snakeCtx.beginPath();
+                    snakeCtx.arc(seg.x*cellSize+cellSize/2, seg.y*cellSize+cellSize*0.7, 6, 0.1, Math.PI - 0.1);
+                    snakeCtx.strokeStyle='#8B4513';
+                    snakeCtx.lineWidth=2;
+                    snakeCtx.stroke();
+                }
+            }); 
+            snakeCtx.fillStyle='#ff3b3b';
+            snakeCtx.beginPath();
+            snakeCtx.arc(food.x*cellSize+cellSize/2,food.y*cellSize+cellSize/2,cellSize/2-2,0,Math.PI*2);
+            snakeCtx.fill();
+            snakeCtx.fillStyle='#228B22';
+            snakeCtx.fillRect(food.x*cellSize+cellSize/2-2, food.y*cellSize+cellSize/2-8, 4, 8);
+            if(bombVisible && bomb){
+                snakeCtx.fillStyle='#2c2c2c';
+                snakeCtx.beginPath();
+                snakeCtx.arc(bomb.x*cellSize+cellSize/2, bomb.y*cellSize+cellSize/2, cellSize/2-3, 0, Math.PI*2);
+                snakeCtx.fill();
+                snakeCtx.fillStyle='#ffaa22';
+                snakeCtx.font='bold 14px monospace';
+                snakeCtx.fillText('💣', bomb.x*cellSize+8, bomb.y*cellSize+18);
+            }
+        }
+        function gameOverSnake() { gameRunning=false; isSnakeActive=false; if(snakeGameLoop){ clearInterval(snakeGameLoop); snakeGameLoop=null; } if(bombTimeout) clearTimeout(bombTimeout); document.getElementById('finalScore').innerHTML=score; document.getElementById('gameOverMsg').classList.add('show'); }
+        
+        // ========== حافظه ==========
+        let memoryInitialized = false;
+        let currentLevel = 1;
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let tries = 0;
+        let canFlip = true;
+        let memoryGameActive = true;
+        let levelTimer = 0;
+        let levelTimerInterval = null;
+        let waitingForNext = false;
+        const levelPairs = [2, 4, 6, 8, 10, 12];
+        const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐴', '🐝', '🐙', '🦋', '🐠', '🐳', '🍎', '🍕', '⚽', '🎨', '🎵', '🚗'];
+        function stopLevelTimer() { if(levelTimerInterval) { clearInterval(levelTimerInterval); levelTimerInterval = null; } }
+        function startLevelTimer() { stopLevelTimer(); levelTimer = 0; document.getElementById('levelTimer').innerText = '0'; levelTimerInterval = setInterval(() => { if(memoryGameActive && !waitingForNext) { levelTimer++; document.getElementById('levelTimer').innerText = levelTimer; } }, 1000); }
+        function initMemoryGame() { if(memoryInitialized) { resetAllMemoryGame(); return; } memoryInitialized = true; document.getElementById('memoryUserName').innerHTML = currentUserName; document.getElementById('resetMemoryBtn').addEventListener('click', () => resetAllMemoryGame()); document.getElementById('nextLevelBtn').addEventListener('click', () => goToNextLevel()); resetAllMemoryGame(); }
+        function resetAllMemoryGame() { stopLevelTimer(); currentLevel = 1; waitingForNext = false; document.getElementById('nextLevelBtn').style.display = 'none'; startLevelForReal(); }
+        function startLevelForReal() { memoryGameActive = true; waitingForNext = false; canFlip = true; flippedCards = []; const pairsNeeded = levelPairs[Math.min(currentLevel-1, levelPairs.length-1)] || 12; const selectedEmojis = emojis.slice(0, pairsNeeded); cards = []; for(let i=0; i<selectedEmojis.length; i++) { cards.push({id:i, emoji:selectedEmojis[i], matched:false, flipped:false}); cards.push({id:i, emoji:selectedEmojis[i], matched:false, flipped:false}); } for(let i=cards.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [cards[i], cards[j]] = [cards[j], cards[i]]; } matchedPairs = 0; tries = 0; document.getElementById('pairsMatched').innerText = matchedPairs; document.getElementById('totalPairs').innerText = pairsNeeded; document.getElementById('triesCount').innerText = tries; document.getElementById('currentLevel').innerText = currentLevel; document.getElementById('levelBadge').innerHTML = `مرحله ${currentLevel}`; document.getElementById('memoryStatus').innerHTML = `🌟 مرحله ${currentLevel}: ${pairsNeeded} جفت رو پیدا کن!`; renderMemoryGrid(); startLevelTimer(); }
+        function renderMemoryGrid() { const grid = document.getElementById('memoryGrid'); grid.innerHTML = ''; const pairs = cards.length/2; if(pairs <= 4) grid.style.gridTemplateColumns = 'repeat(4, 1fr)'; else if(pairs <= 8) grid.style.gridTemplateColumns = 'repeat(4, 1fr)'; else grid.style.gridTemplateColumns = 'repeat(6, 1fr)'; cards.forEach((card, idx) => { const cardDiv = document.createElement('div'); cardDiv.className = 'memory-card'; if(card.matched) cardDiv.classList.add('matched'); if(card.flipped) cardDiv.classList.add('flipped'); cardDiv.innerHTML = `<div class="card-back">?</div><div class="card-emoji">${card.emoji}</div>`; cardDiv.addEventListener('click', (e) => { e.stopPropagation(); if(!memoryGameActive || !canFlip || waitingForNext || card.matched || card.flipped) return; flipCard(idx); }); grid.appendChild(cardDiv); }); }
+        async function flipCard(index) { if(!memoryGameActive || !canFlip || waitingForNext) return; if(cards[index].flipped || cards[index].matched) return; cards[index].flipped = true; flippedCards.push(index); renderMemoryGrid(); if(flippedCards.length === 2) { tries++; document.getElementById('triesCount').innerText = tries; canFlip = false; const card1 = cards[flippedCards[0]], card2 = cards[flippedCards[1]]; if(card1.id === card2.id) { card1.matched = true; card2.matched = true; matchedPairs++; document.getElementById('pairsMatched').innerText = matchedPairs; flippedCards = []; canFlip = true; renderMemoryGrid(); if(matchedPairs === cards.length/2) { levelComplete(); } } else { setTimeout(() => { if(!memoryGameActive) return; cards[flippedCards[0]].flipped = false; cards[flippedCards[1]].flipped = false; flippedCards = []; canFlip = true; renderMemoryGrid(); }, 800); } } }
+        function levelComplete() { if(!memoryGameActive) return; memoryGameActive = false; stopLevelTimer(); const timeSpent = levelTimer; showMessage(`🎉 مرحله ${currentLevel} رو در ${timeSpent} ثانیه تموم کردی! 🎉`); document.getElementById('memoryStatus').innerHTML = `✅ مرحله ${currentLevel} کامل شد! زمان: ${timeSpent} ثانیه. برای مرحله بعد آماده‌ای؟`; const nextBtn = document.getElementById('nextLevelBtn'); nextBtn.style.display = 'inline-block'; waitingForNext = true; }
+        function goToNextLevel() { if(currentLevel < levelPairs.length) { currentLevel++; waitingForNext = false; document.getElementById('nextLevelBtn').style.display = 'none'; startLevelForReal(); } else { document.getElementById('memoryStatus').innerHTML = `🏆 آفرین ${currentUserName}! تو همه ${levelPairs.length} مرحله رو پشت سر گذاشتی! 🏆`; document.getElementById('nextLevelBtn').style.display = 'none'; showMessage(`🎊 تبریک! تو قهرمان حافظه‌ای شدی! 🎊`); } }
+        
+        // ========== فوتبال استارز ==========
+        let footballInitialized = false;
+        let footballCanvas, footballCtx;
+        let footballAnimationId = null;
+        let playerScore = 0, computerScore = 0;
+        let currentTurn = 'player';
+        let canShoot = true;
+        let isWaitingForAI = false;
+        let aiThinkTimer = null;
+        
+        const initialPlayerPieces = [
+            { x: 780, y: 300, radius: 28, type: 'player', vx: 0, vy: 0, emoji: '⚡' },
+            { x: 720, y: 370, radius: 28, type: 'player', vx: 0, vy: 0, emoji: '⚡' },
+            { x: 840, y: 390, radius: 28, type: 'player', vx: 0, vy: 0, emoji: '⚡' }
+        ];
+        
+        const initialComputerPieces = [
+            { x: 320, y: 300, radius: 28, type: 'computer', vx: 0, vy: 0, emoji: '🎗️' },
+            { x: 260, y: 370, radius: 28, type: 'computer', vx: 0, vy: 0, emoji: '🎗️' },
+            { x: 380, y: 390, radius: 28, type: 'computer', vx: 0, vy: 0, emoji: '🎗️' }
+        ];
+        
+        let playerPieces = JSON.parse(JSON.stringify(initialPlayerPieces));
+        let computerPieces = JSON.parse(JSON.stringify(initialComputerPieces));
+        let ball = { x: 550, y: 350, vx: 0, vy: 0, radius: 15 };
+        let gameActiveFootball = true;
+        
+        let isDraggingPiece = false;
+        let draggedPiece = null;
+        let dragStart = { x: 0, y: 0 };
+        let dragCurrent = { x: 0, y: 0 };
+        let power = 0;
+        let maxPower = 24;
+        
+        const goalLeft = { x: 15, yTop: 240, yBottom: 460, width: 16, height: 220 };
+        const goalRight = { x: 1069, yTop: 240, yBottom: 460, width: 16, height: 220 };
+        
+        function showGoalAlert(scoreText) {
+            const alertDiv = document.getElementById('goalAlert');
+            alertDiv.innerText = scoreText;
+            alertDiv.classList.add('show');
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+            }, 1800);
+        }
+        
+        function checkGameWinner() {
+            if(playerScore >= 3) {
+                gameActiveFootball = false;
+                document.getElementById('winnerTitle').innerText = '🎉 شما قهرمان شدید! 🎉';
+                document.getElementById('finalScore').innerText = playerScore;
+                document.getElementById('finalCompScore').innerText = computerScore;
+                document.getElementById('gameOverMsg').classList.add('show');
+                return true;
+            } else if(computerScore >= 3) {
+                gameActiveFootball = false;
+                document.getElementById('winnerTitle').innerText = '😭 حریف قهرمان شد!';
+                document.getElementById('finalScore').innerText = playerScore;
+                document.getElementById('finalCompScore').innerText = computerScore;
+                document.getElementById('gameOverMsg').classList.add('show');
+                return true;
+            }
+            return false;
+        }
+        
+        function resetAllPieces() {
+            playerPieces = JSON.parse(JSON.stringify(initialPlayerPieces));
+            computerPieces = JSON.parse(JSON.stringify(initialComputerPieces));
+            ball.x = 550; ball.y = 350;
+            ball.vx = 0; ball.vy = 0;
+        }
+        
+        function resetPositionsAfterGoal() {
+            resetAllPieces();
+            currentTurn = 'player';
+            canShoot = true;
+            isWaitingForAI = false;
+            if(aiThinkTimer) clearTimeout(aiThinkTimer);
+            document.getElementById('footballStatus').innerHTML = "👇 نوبت شماست! روی مهره‌های خودت (⚡) کلیک کن و بکش";
+            drawFootball(false);
+        }
+        
+        function initFootballGame() {
+            if(footballInitialized) {
+                resetFullFootballGame();
+                return;
+            }
+            footballInitialized = true;
+            footballCanvas = document.getElementById('footballCanvas');
+            footballCtx = footballCanvas.getContext('2d');
+            document.getElementById('footballUserName').innerHTML = currentUserName;
+            
+            function getMousePos(e) {
+                const rect = footballCanvas.getBoundingClientRect();
+                const scaleX = footballCanvas.width / rect.width;
+                const scaleY = footballCanvas.height / rect.height;
+                let clientX, clientY;
+                if(e.touches) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                    e.preventDefault();
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                let x = (clientX - rect.left) * scaleX;
+                let y = (clientY - rect.top) * scaleY;
+                x = Math.min(Math.max(0, x), footballCanvas.width);
+                y = Math.min(Math.max(0, y), footballCanvas.height);
+                return { x, y };
+            }
+            
+            function getPieceAt(x, y) {
+                if(currentTurn !== 'player' || !canShoot || !gameActiveFootball) return null;
+                for(let p of playerPieces) {
+                    const dx = x - p.x;
+                    const dy = y - p.y;
+                    if(Math.hypot(dx, dy) < p.radius + 12) return p;
+                }
+                return null;
+            }
+            
+            function onPointerDown(e) {
+                if(!gameActiveFootball || currentTurn !== 'player' || !canShoot) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
+                const piece = getPieceAt(pos.x, pos.y);
+                if(piece) {
+                    isDraggingPiece = true;
+                    draggedPiece = piece;
+                    dragStart = { x: piece.x, y: piece.y };
+                    dragCurrent = { x: pos.x, y: pos.y };
+                    power = 0;
+                    updatePowerBar(0);
+                    document.getElementById('footballStatus').innerHTML = "💪 بکش تا ضربه بزنی...";
+                }
+            }
+            
+            function onPointerMove(e) {
+                if(!isDraggingPiece || !draggedPiece) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
+                dragCurrent = pos;
+                let dragDistance = Math.hypot(dragCurrent.x - dragStart.x, dragCurrent.y - dragStart.y);
+                power = Math.min(maxPower, dragDistance / 5.5);
+                updatePowerBar(power / maxPower * 100);
+                drawFootball(true);
+            }
+            
+            function onPointerUp(e) {
+                if(!isDraggingPiece || !draggedPiece) {
+                    isDraggingPiece = false;
+                    draggedPiece = null;
+                    drawFootball(false);
+                    updatePowerBar(0);
+                    return;
+                }
+                e.preventDefault();
+                if(power > 1.8 && gameActiveFootball && currentTurn === 'player' && canShoot) {
+                    let angle = Math.atan2(dragStart.y - dragCurrent.y, dragStart.x - dragCurrent.x);
+                    let force = power * 1.3;
+                    draggedPiece.vx = Math.cos(angle) * force;
+                    draggedPiece.vy = Math.sin(angle) * force;
+                    document.getElementById('footballStatus').innerHTML = "⚡ ضربه زدی! صبر کن تا توپ حرکت کنه...";
+                    canShoot = false;
+                    currentTurn = 'computer';
+                    isWaitingForAI = true;
+                    
+                    function checkBallSpeedAndAITurn() {
+                        if(!gameActiveFootball) return;
+                        let ballSpeed = Math.hypot(ball.vx, ball.vy);
+                        if((ballSpeed < 0.8 && isWaitingForAI === true) || (Math.abs(ball.vx) < 0.5 && Math.abs(ball.vy) < 0.5)) {
+                            isWaitingForAI = false;
+                            if(aiThinkTimer) clearTimeout(aiThinkTimer);
+                            aiTurn();
+                        } else {
+                            aiThinkTimer = setTimeout(checkBallSpeedAndAITurn, 200);
+                        }
+                    }
+                    if(aiThinkTimer) clearTimeout(aiThinkTimer);
+                    aiThinkTimer = setTimeout(checkBallSpeedAndAITurn, 300);
+                }
+                isDraggingPiece = false;
+                draggedPiece = null;
+                power = 0;
+                updatePowerBar(0);
+                drawFootball(false);
+            }
+            
+            footballCanvas.addEventListener('mousedown', onPointerDown);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+            footballCanvas.addEventListener('touchstart', onPointerDown, {passive: false});
+            window.addEventListener('touchmove', onPointerMove, {passive: false});
+            window.addEventListener('touchend', onPointerUp);
+            
+            document.getElementById('restartFootballBtn').addEventListener('click', () => resetFullFootballGame());
+            document.getElementById('closeGameOverBtn').addEventListener('click', () => { 
+                document.getElementById('gameOverMsg').classList.remove('show');
+                resetFullFootballGame();
+            });
+            
+            resetFullFootballGame();
+        }
+        
+        function aiTurn() {
+            if(!gameActiveFootball || currentTurn !== 'computer') return;
+            
+            let closestPiece = null;
+            let closestDist = Infinity;
+            for(let p of computerPieces) {
+                let dist = Math.hypot(ball.x - p.x, ball.y - p.y);
+                if(dist < closestDist) {
+                    closestDist = dist;
+                    closestPiece = p;
+                }
+            }
+            
+            if(!closestPiece && computerPieces.length > 0) closestPiece = computerPieces[0];
+            
+            if(closestPiece) {
+                let targetX, targetY;
+                let isDefending = false;
+                
+                if(ball.x < 250 && closestDist < 150) {
+                    targetX = footballCanvas.width - 100;
+                    targetY = 350 + (Math.random() - 0.5) * 100;
+                    isDefending = true;
+                } else {
+                    targetX = footballCanvas.width - 60;
+                    targetY = 350 + (Math.random() - 0.5) * 120;
+                }
+                
+                let angle = Math.atan2(targetY - closestPiece.y, targetX - closestPiece.x);
+                let forceBase = 7 + (Math.random() * 5);
+                if(closestDist < 80) forceBase += 3;
+                if(isDefending) forceBase *= 0.9;
+                
+                closestPiece.vx = Math.cos(angle) * forceBase;
+                closestPiece.vy = Math.sin(angle) * forceBase;
+                
+                if(isDefending) {
+                    document.getElementById('footballStatus').innerHTML = "🛡️ حریف توپ رو دفع کرد! حالا نوبت شماست...";
+                } else {
+                    document.getElementById('footballStatus').innerHTML = "🎗️ حریف به سمت دروازه شما شوت کرد! حالا نوبت شماست...";
+                }
+            }
+            
+            currentTurn = 'player';
+            canShoot = true;
+            drawFootball(false);
+        }
+        
+        function updatePowerBar(percent) {
+            const bar = document.getElementById('powerBar');
+            if(bar) bar.style.width = percent + '%';
+        }
+        
+        function resetFullFootballGame() {
+            if(footballAnimationId) cancelAnimationFrame(footballAnimationId);
+            playerScore = 0; computerScore = 0;
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('computerScore').innerText = computerScore;
+            
+            resetAllPieces();
+            
+            gameActiveFootball = true;
+            currentTurn = 'player';
+            canShoot = true;
+            isWaitingForAI = false;
+            if(aiThinkTimer) clearTimeout(aiThinkTimer);
+            isDraggingPiece = false;
+            draggedPiece = null;
+            power = 0;
+            updatePowerBar(0);
+            document.getElementById('footballStatus').innerHTML = "👇 نوبت شماست! روی مهره‌های خودت (⚡) کلیک کن و بکش";
+            drawFootball(false);
+            startFootballLoop();
+        }
+        
+        function handlePieceBallCollision(piece) {
+            const dx = ball.x - piece.x;
+            const dy = ball.y - piece.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = ball.radius + piece.radius;
+            if(dist < minDist) {
+                const angle = Math.atan2(dy, dx);
+                const overlap = minDist - dist;
+                const moveX = Math.cos(angle) * overlap * 0.7;
+                const moveY = Math.sin(angle) * overlap * 0.7;
+                piece.x -= moveX;
+                piece.y -= moveY;
+                ball.x += moveX;
+                ball.y += moveY;
+                
+                const pieceSpeed = Math.hypot(piece.vx || 0, piece.vy || 0);
+                if(pieceSpeed > 0.3) {
+                    const pushAngle = angle;
+                    const pushForce = pieceSpeed * 1.0;
+                    ball.vx += Math.cos(pushAngle) * pushForce * 0.8;
+                    ball.vy += Math.sin(pushAngle) * pushForce * 0.8;
+                    piece.vx = (piece.vx || 0) * 0.4;
+                    piece.vy = (piece.vy || 0) * 0.4;
+                }
+                
+                piece.x = Math.min(Math.max(piece.radius + 5, piece.x), footballCanvas.width - piece.radius - 5);
+                piece.y = Math.min(Math.max(piece.radius + 5, piece.y), footballCanvas.height - piece.radius - 5);
+                ball.x = Math.min(Math.max(ball.radius + 5, ball.x), footballCanvas.width - ball.radius - 5);
+                ball.y = Math.min(Math.max(ball.radius + 5, ball.y), footballCanvas.height - ball.radius - 5);
+            }
+        }
+        
+        function handlePiecePieceCollision(p1, p2) {
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = p1.radius + p2.radius;
+            if(dist < minDist) {
+                const angle = Math.atan2(dy, dx);
+                const overlap = minDist - dist;
+                const moveX = Math.cos(angle) * overlap * 0.5;
+                const moveY = Math.sin(angle) * overlap * 0.5;
+                p1.x += moveX;
+                p1.y += moveY;
+                p2.x -= moveX;
+                p2.y -= moveY;
+                
+                const tempVx = p1.vx || 0;
+                const tempVy = p1.vy || 0;
+                p1.vx = (p2.vx || 0) * 0.7;
+                p1.vy = (p2.vy || 0) * 0.7;
+                p2.vx = tempVx * 0.7;
+                p2.vy = tempVy * 0.7;
+            }
+        }
+        
+        function updatePhysics() {
+            if(!gameActiveFootball) return;
+            
+            for(let p of playerPieces) {
+                if(p.vx || p.vy) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.97;
+                    p.vy *= 0.97;
+                    if(Math.abs(p.vx) < 0.1) p.vx = 0;
+                    if(Math.abs(p.vy) < 0.1) p.vy = 0;
+                    p.x = Math.min(Math.max(p.radius + 5, p.x), footballCanvas.width - p.radius - 5);
+                    p.y = Math.min(Math.max(p.radius + 5, p.y), footballCanvas.height - p.radius - 5);
+                }
+                handlePieceBallCollision(p);
+            }
+            
+            for(let p of computerPieces) {
+                if(p.vx || p.vy) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.97;
+                    p.vy *= 0.97;
+                    if(Math.abs(p.vx) < 0.1) p.vx = 0;
+                    if(Math.abs(p.vy) < 0.1) p.vy = 0;
+                    p.x = Math.min(Math.max(p.radius + 5, p.x), footballCanvas.width - p.radius - 5);
+                    p.y = Math.min(Math.max(p.radius + 5, p.y), footballCanvas.height - p.radius - 5);
+                }
+                handlePieceBallCollision(p);
+            }
+            
+            for(let i = 0; i < playerPieces.length; i++) {
+                for(let j = i+1; j < playerPieces.length; j++) handlePiecePieceCollision(playerPieces[i], playerPieces[j]);
+            }
+            for(let i = 0; i < computerPieces.length; i++) {
+                for(let j = i+1; j < computerPieces.length; j++) handlePiecePieceCollision(computerPieces[i], computerPieces[j]);
+            }
+            for(let p of playerPieces) {
+                for(let c of computerPieces) handlePiecePieceCollision(p, c);
+            }
+            
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            ball.vx *= 0.99;
+            ball.vy *= 0.98;
+            if(Math.abs(ball.vx) < 0.08 && Math.abs(ball.vy) < 0.08) {
+                ball.vx = 0; ball.vy = 0;
+            }
+            
+            if(ball.y - ball.radius <= 0) { ball.y = ball.radius; ball.vy = -ball.vy * 0.7; }
+            if(ball.y + ball.radius >= footballCanvas.height) { ball.y = footballCanvas.height - ball.radius; ball.vy = -ball.vy * 0.7; }
+            if(ball.x - ball.radius <= 0 && (ball.y < goalLeft.yTop || ball.y > goalLeft.yBottom)) { ball.x = ball.radius; ball.vx = -ball.vx * 0.6; }
+            if(ball.x + ball.radius >= footballCanvas.width && (ball.y < goalRight.yTop || ball.y > goalRight.yBottom)) { ball.x = footballCanvas.width - ball.radius; ball.vx = -ball.vx * 0.6; }
+            
+            checkGoal();
+        }
+        
+        function checkGoal() {
+            if(ball.x - ball.radius <= goalLeft.x + goalLeft.width && ball.y + ball.radius > goalLeft.yTop && ball.y - ball.radius < goalLeft.yBottom) {
+                playerScore++;
+                document.getElementById('playerScore').innerText = playerScore;
+                showGoalAlert(`🎯 ${playerScore} - ${computerScore}`);
+                if(!checkGameWinner()) resetPositionsAfterGoal();
+                return true;
+            }
+            if(ball.x + ball.radius >= goalRight.x && ball.y + ball.radius > goalRight.yTop && ball.y - ball.radius < goalRight.yBottom) {
+                computerScore++;
+                document.getElementById('computerScore').innerText = computerScore;
+                showGoalAlert(`😭 ${playerScore} - ${computerScore}`);
+                if(!checkGameWinner()) resetPositionsAfterGoal();
+                return true;
+            }
+            return false;
+        }
+        
+        function drawFootball(showAimLine = false) {
+            if(!footballCtx) return;
+            footballCtx.clearRect(0, 0, footballCanvas.width, footballCanvas.height);
+            
+            footballCtx.fillStyle = '#1b5e20';
+            footballCtx.fillRect(0, 0, footballCanvas.width, footballCanvas.height);
+            footballCtx.strokeStyle = '#2e7d32';
+            footballCtx.lineWidth = 2;
+            for(let i = 0; i < footballCanvas.height; i += 35) {
+                footballCtx.beginPath();
+                footballCtx.moveTo(0, i);
+                footballCtx.lineTo(footballCanvas.width, i);
+                footballCtx.stroke();
+            }
+            
+            footballCtx.strokeStyle = 'white';
+            footballCtx.lineWidth = 3;
+            footballCtx.strokeRect(25, 25, footballCanvas.width-50, footballCanvas.height-50);
+            footballCtx.beginPath();
+            footballCtx.moveTo(footballCanvas.width/2, 25);
+            footballCtx.lineTo(footballCanvas.width/2, footballCanvas.height-25);
+            footballCtx.stroke();
+            footballCtx.beginPath();
+            footballCtx.arc(footballCanvas.width/2, footballCanvas.height/2, 50, 0, Math.PI*2);
+            footballCtx.stroke();
+            footballCtx.strokeRect(45, 210, 70, 280);
+            footballCtx.strokeRect(footballCanvas.width-115, 210, 70, 280);
+            
+            footballCtx.fillStyle = '#b71c1c';
+            footballCtx.fillRect(goalLeft.x, goalLeft.yTop, goalLeft.width, goalLeft.height);
+            footballCtx.fillStyle = '#1565c0';
+            footballCtx.fillRect(goalRight.x, goalRight.yTop, goalRight.width, goalRight.height);
+            
+            footballCtx.shadowBlur = 6;
+            footballCtx.fillStyle = '#f5c542';
+            footballCtx.fillRect(150, 15, 200, 38);
+            footballCtx.fillRect(footballCanvas.width-350, 15, 200, 38);
+            footballCtx.fillStyle = '#1a1a2e';
+            footballCtx.font = 'bold 18px "Segoe UI"';
+            footballCtx.textAlign = 'center';
+            footballCtx.fillText("⚽ HOBBY LAND ⚽", 250, 42);
+            footballCtx.fillText("⚽ HOBBY LAND ⚽", footballCanvas.width-250, 42);
+            footballCtx.shadowBlur = 0;
+            
+            for(let p of computerPieces) {
+                const grad = footballCtx.createRadialGradient(p.x-6, p.y-6, 5, p.x, p.y, p.radius);
+                grad.addColorStop(0, '#e53935');
+                grad.addColorStop(1, '#b71c1c');
+                footballCtx.beginPath();
+                footballCtx.arc(p.x, p.y, p.radius-2, 0, Math.PI*2);
+                footballCtx.fillStyle = grad;
+                footballCtx.fill();
+                footballCtx.strokeStyle = '#ffcc80';
+                footballCtx.lineWidth = 2.5;
+                footballCtx.stroke();
+                footballCtx.fillStyle = 'white';
+                footballCtx.font = `${p.radius+4}px sans-serif`;
+                footballCtx.textAlign = 'center';
+                footballCtx.fillText(p.emoji, p.x, p.y+8);
+            }
+            
+            for(let p of playerPieces) {
+                const grad = footballCtx.createRadialGradient(p.x-6, p.y-6, 5, p.x, p.y, p.radius);
+                grad.addColorStop(0, '#42a5f5');
+                grad.addColorStop(1, '#1565c0');
+                footballCtx.beginPath();
+                footballCtx.arc(p.x, p.y, p.radius-2, 0, Math.PI*2);
+                footballCtx.fillStyle = grad;
+                footballCtx.fill();
+                footballCtx.strokeStyle = '#ffcc80';
+                footballCtx.lineWidth = 2.5;
+                footballCtx.stroke();
+                footballCtx.fillStyle = 'white';
+                footballCtx.font = `${p.radius+4}px sans-serif`;
+                footballCtx.textAlign = 'center';
+                footballCtx.fillText(p.emoji, p.x, p.y+8);
+            }
+            
+            footballCtx.shadowBlur = 6;
+            footballCtx.beginPath();
+            footballCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+            const ballGrad = footballCtx.createRadialGradient(ball.x-4, ball.y-4, 4, ball.x, ball.y, ball.radius);
+            ballGrad.addColorStop(0, '#ffffff');
+            ballGrad.addColorStop(1, '#cccccc');
+            footballCtx.fillStyle = ballGrad;
+            footballCtx.fill();
+            footballCtx.fillStyle = '#333';
+            footballCtx.font = `${ball.radius+5}px sans-serif`;
+            footballCtx.fillText("⚽", ball.x, ball.y+7);
+            footballCtx.shadowBlur = 0;
+            
+            if(showAimLine && isDraggingPiece && draggedPiece && power > 0.5) {
+                let angle = Math.atan2(dragStart.y - dragCurrent.y, dragStart.x - dragCurrent.x);
+                let arrowLength = Math.min(power * 9, 120);
+                let endX = draggedPiece.x + Math.cos(angle) * arrowLength;
+                let endY = draggedPiece.y + Math.sin(angle) * arrowLength;
+                
+                footballCtx.beginPath();
+                footballCtx.moveTo(draggedPiece.x, draggedPiece.y);
+                footballCtx.lineTo(endX, endY);
+                footballCtx.strokeStyle = '#ffb347';
+                footballCtx.lineWidth = 4;
+                footballCtx.stroke();
+                
+                let arrowAngle = angle;
+                let arrowX = endX - Math.cos(arrowAngle) * 12;
+                let arrowY = endY - Math.sin(arrowAngle) * 12;
+                footballCtx.beginPath();
+                footballCtx.moveTo(endX, endY);
+                footballCtx.lineTo(arrowX - Math.sin(arrowAngle) * 6, arrowY + Math.cos(arrowAngle) * 6);
+                footballCtx.lineTo(arrowX + Math.sin(arrowAngle) * 6, arrowY - Math.cos(arrowAngle) * 6);
+                footballCtx.fillStyle = '#ffb347';
+                footballCtx.fill();
+                
+                footballCtx.font = "bold 14px monospace";
+                footballCtx.fillStyle = "#ffb347";
+                footballCtx.fillText(`${Math.floor(power*5)}`, draggedPiece.x-18, draggedPiece.y-18);
+            }
+            footballCtx.textAlign = 'left';
+        }
+        
+        function startFootballLoop() {
+            function animate() {
+                updatePhysics();
+                drawFootball(false);
+                footballAnimationId = requestAnimationFrame(animate);
+            }
+            if(footballAnimationId) cancelAnimationFrame(footballAnimationId);
+            animate();
+        }
+        
+        // ========== اسم فامیل ==========
+        let familyTimerInterval = null;
+        let familyTimeLeft = 120;
+        let familyGameActive = false;
+        
+        function initFamilyGameUI() {
+            document.getElementById('familyUserName').innerHTML = currentUserName;
+            const tbody = document.getElementById('familyTableBody');
+            tbody.innerHTML = '';
+            const categories = [
+                { title: "اسم", key: "name", emoji: "👤" },{ title: "فامیلی", key: "family", emoji: "📛" },{ title: "غذا", key: "food", emoji: "🍕" },{ title: "میوه", key: "fruit", emoji: "🍎" },{ title: "رنگ", key: "color", emoji: "🎨" },{ title: "شغل", key: "job", emoji: "👨‍💼" },{ title: "ماشین", key: "car", emoji: "🚗" },{ title: "کشور", key: "country", emoji: "🌍" },{ title: "اشیا", key: "object", emoji: "📦" },{ title: "گل", key: "flower", emoji: "🌹" },{ title: "اعضای بدن", key: "body", emoji: "🦵" },{ title: "حیوان", key: "animal", emoji: "🐕" },{ title: "شهر", key: "city", emoji: "🏙️" },{ title: "فیلم یا انیمیشن", key: "movie", emoji: "🎬" }
+            ];
+            for(let cat of categories) {
+                let tr = document.createElement('tr');
+                let tdTitle = document.createElement('td');
+                tdTitle.innerText = `${cat.emoji} ${cat.title}`;
+                tr.appendChild(tdTitle);
+                let tdAnswer = document.createElement('td');
+                let inp = document.createElement('input');
+                inp.type = 'text';
+                inp.classList.add('family-input');
+                inp.setAttribute('data-cat', cat.key);
+                inp.disabled = true;
+                tdAnswer.appendChild(inp);
+                tr.appendChild(tdAnswer);
+                tbody.appendChild(tr);
+            }
+            updateFamilyTimerDisplay();
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+            familyGameActive = false;
+            document.getElementById('familyStatus').innerHTML = '⏳ روی شروع کلیک کن و تا ۲ دقیقه فرصت داری!';
+        }
+        
+        function startFamilyGame() {
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+            const inputs = document.querySelectorAll('#familyTable .family-input');
+            inputs.forEach(inp => { inp.value = ''; inp.disabled = false; });
+            familyTimeLeft = 120;
+            updateFamilyTimerDisplay();
+            familyGameActive = true;
+            familyTimerInterval = setInterval(() => {
+                if(!familyGameActive) return;
+                if(familyTimeLeft <= 1){
+                    clearInterval(familyTimerInterval);
+                    familyGameActive = false;
+                    const allInputs = document.querySelectorAll('#familyTable .family-input');
+                    allInputs.forEach(inp => inp.disabled = true);
+                    document.getElementById('familyStatus').innerHTML = '⏰ زمان تمام شد! می‌توانی عکس جدول رو ذخیره کنی.';
+                    showMessage('زمان بازی اسم فامیل تمام شد!');
+                } else {
+                    familyTimeLeft--;
+                    updateFamilyTimerDisplay();
+                }
+            }, 1000);
+            document.getElementById('familyStatus').innerHTML = '✍️ شروع کن! هر چی بنویسی بعدا عکس ذخیره میشه...';
+        }
+        
+        function updateFamilyTimerDisplay() {
+            let mins = Math.floor(familyTimeLeft / 60);
+            let secs = familyTimeLeft % 60;
+            document.getElementById('familyTimerDisplay').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        }
+        
+        async function downloadFamilyAsImage() {
+            const element = document.getElementById('familyTableForCapture');
+            if(!element) { showMessage("خطا: جدول پیدا نشد!", true); return; }
+            showMessage("در حال تهیه عکس از جدول...");
+            try {
+                const dataUrl = await domtoimage.toPng(element, { quality: 1, bgcolor: '#1e2a3a' });
+                const link = document.createElement('a');
+                link.download = `اسم_فامیل_${currentUserName}_${Date.now()}.png`;
+                link.href = dataUrl;
+                link.click();
+                showMessage("عکس با موفقیت ذخیره شد! ✅");
+            } catch(err) {
+                console.error(err);
+                showMessage("خطا در ذخیره عکس! دوباره تلاش کن.", true);
+            }
+        }
+        
+        // دکمه‌های بازگشت
+        document.getElementById('backFromPaintingBtn').addEventListener('click',()=>{ showPage('games'); });
+        document.getElementById('backFromSnakeBtn').addEventListener('click',()=>{ stopSnakeGameCompletely(); showPage('games'); });
+        document.getElementById('backFromMemoryBtn').addEventListener('click',()=>{ stopLevelTimer(); memoryGameActive=false; showPage('games'); });
+        document.getElementById('backFromFamilyBtn').addEventListener('click',()=>{ if(familyTimerInterval) clearInterval(familyTimerInterval); familyGameActive=false; showPage('games'); });
+        document.getElementById('backFromFootballBtn').addEventListener('click',()=>{ if(footballAnimationId) cancelAnimationFrame(footballAnimationId); showPage('games'); });
+        document.getElementById('backFromSpaceBtn').addEventListener('click',()=>{ if(spaceAnimationId) cancelAnimationFrame(spaceAnimationId); showPage('games'); });
+        document.getElementById('startFamilyGameBtn').addEventListener('click', startFamilyGame);
+        document.getElementById('downloadFamilyImageBtn').addEventListener('click', downloadFamilyAsImage);
+        
+        function checkLogin() {
+            const name = loginNameInput.value.trim();
+            if(name === "حمیدرضا" || name === "الهه"){
+                currentUserName = name;
+                loginOverlay.style.display = 'none';
+                document.getElementById('gamesUserName').innerHTML = `خوش آمدی ${currentUserName} 🎮`;
+                buildGamesGrid();
+                showPage('games');
+                showMessage(`✨ خوش آمدی ${currentUserName} جان! یک بازی رو انتخاب کن ✨`);
+                for(let i=0;i<45;i++){ let em=document.createElement('div'); em.className='floating-emoji'; em.innerText=['💎','🖌️','🖼️','🌈','🎨','🐍','🍎','🧠','⚽','🌌'][i%10]; em.style.left=Math.random()*100+'%'; em.style.animationDuration=(12+Math.random()*22)+'s'; em.style.animationDelay=Math.random()*25+'s'; document.body.appendChild(em); }
+            } else { loginError.style.display='block'; setTimeout(()=>loginError.style.display='none',2000); }
+        }
+        loginBtn.addEventListener('click',checkLogin); loginNameInput.addEventListener('keypress',(e)=> {if(e.key==='Enter') checkLogin();});
+        
+        let isNight=false;
+        function setupTheme(btnId){ const btn=document.getElementById(btnId); if(btn) btn.addEventListener('click',()=>{ isNight=!isNight; if(isNight){ document.body.classList.add('night-mode'); btn.innerHTML='🌙'; }else{ document.body.classList.remove('night-mode'); btn.innerHTML='☀️'; } }); }
+        setupTheme('themeToggleBtnGames'); setupTheme('themeToggleBtnPainting'); setupTheme('themeToggleBtnSnake'); setupTheme('themeToggleBtnMemory'); setupTheme('themeToggleBtnFamily'); setupTheme('themeToggleBtnFootball'); setupTheme('themeToggleBtnSpace');
+    })();
+</script>
+</body>
+</html>
