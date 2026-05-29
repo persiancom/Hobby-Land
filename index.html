@@ -882,6 +882,51 @@
             cursor: pointer;
             color: white;
         }
+        
+        /* کادر چت */
+        .chat-box {
+            margin-top: 15px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            padding: 10px;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+            background: #2c3e50;
+            color: white;
+        }
+        .chat-input-area input::placeholder {
+            color: #aaa;
+        }
+        .chat-messages {
+            height: 120px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+        .chat-message {
+            margin-bottom: 5px;
+            padding: 4px 8px;
+            background: rgba(255,180,70,0.2);
+            border-radius: 12px;
+        }
+        .chat-message strong {
+            color: #ffb347;
+        }
+        .chat-message span {
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             .light-bulb { width: 14px; height: 18px; }
             .game-title { font-size: 1.4rem; }
@@ -896,6 +941,9 @@
             .space-stats { font-size: 0.9rem; gap: 15px; }
         }
     </style>
+    <!-- Firebase SDK ها -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 </head>
@@ -951,6 +999,17 @@
             <button id="saveBtn">💾 ذخیره</button>
         </div>
         <div class="status" id="toolStatus">🎨 ابزار: قلم</div>
+        
+        <!-- کادر چت همزمان -->
+        <div class="chat-box">
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="پیام خود را بنویسید...">
+                <button id="sendChatBtn">📨 ارسال</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div style="color: #aaa; text-align: center;">💬 پیام‌ها اینجا نمایش داده می‌شود...</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1079,6 +1138,23 @@
 </div>
 
 <script>
+    // ========== تنظیمات Firebase ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyARAsQaZhfHHPFVBOpKmPx7u90UVrJoUuM",
+        authDomain: "hobby-land-b0e00.firebaseapp.com",
+        databaseURL: "https://hobby-land-b0e00-default-rtdb.firebaseio.com",
+        projectId: "hobby-land-b0e00",
+        storageBucket: "hobby-land-b0e00.firebasestorage.app",
+        messagingSenderId: "1001642178322",
+        appId: "1:1001642178322:web:a2ca537d1520b9b43d65cb"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const drawingRef = database.ref('drawing');
+    const chatRef = database.ref('chat');
+    
+    // ========== بقیه کدها ==========
     (function(){
         const GAMES = [
             { id: "painting", name: "بوم نقاشی حرفه‌ای", emoji: "🎨", color: "#ffb347" },
@@ -1154,339 +1230,7 @@
             });
         }
         
-        // ========== بازی فضایی راه شیری (پیشرفته، بدون ایموجی) ==========
-        let spaceInitialized = false;
-        let spaceCanvas, spaceCtx;
-        let spaceAnimationId = null;
-        let spaceScore = 0;
-        let spaceLives = 3;
-        let spaceLevel = 1;
-        let spaceGameActive = true;
-        
-        let player = { x: 500, y: 620, width: 36, height: 36 };
-        let bullets = [];
-        let enemies = [];
-        let stars = [];
-        let particles = [];
-        
-        let enemySpeed = 2.2;
-        let enemySpawnRate = 40;
-        let frameCount = 0;
-        let mouseX = 500, mouseY = 620;
-        
-        function initSpaceGame() {
-            if(spaceInitialized) {
-                resetSpaceGame();
-                return;
-            }
-            spaceInitialized = true;
-            spaceCanvas = document.getElementById('spaceCanvas');
-            spaceCtx = spaceCanvas.getContext('2d');
-            document.getElementById('spaceUserName').innerHTML = currentUserName;
-            
-            function getMousePos(e) {
-                const rect = spaceCanvas.getBoundingClientRect();
-                const scaleX = spaceCanvas.width / rect.width;
-                const scaleY = spaceCanvas.height / rect.height;
-                let clientX, clientY;
-                if(e.touches) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
-                    e.preventDefault();
-                } else {
-                    clientX = e.clientX;
-                    clientY = e.clientY;
-                }
-                let x = (clientX - rect.left) * scaleX;
-                let y = (clientY - rect.top) * scaleY;
-                x = Math.min(Math.max(20, x), spaceCanvas.width - 20);
-                y = Math.min(Math.max(20, y), spaceCanvas.height - 20);
-                return { x, y };
-            }
-            
-            function onPointerMove(e) {
-                if(!spaceGameActive) return;
-                const pos = getMousePos(e);
-                player.x = pos.x;
-                player.y = pos.y;
-            }
-            
-            function onShoot(e) {
-                if(!spaceGameActive) return;
-                bullets.push({ x: player.x, y: player.y - 25, width: 5, height: 15 });
-                e.preventDefault();
-            }
-            
-            spaceCanvas.addEventListener('mousemove', onPointerMove);
-            spaceCanvas.addEventListener('touchmove', onPointerMove, {passive: false});
-            spaceCanvas.addEventListener('click', onShoot);
-            spaceCanvas.addEventListener('touchstart', onShoot, {passive: false});
-            
-            document.getElementById('restartSpaceBtn').addEventListener('click', () => resetSpaceGame());
-            document.getElementById('closeGameOverBtn').addEventListener('click', () => { 
-                document.getElementById('gameOverMsg').classList.remove('show');
-                resetSpaceGame();
-            });
-            
-            createStars();
-            resetSpaceGame();
-        }
-        
-        function createStars() {
-            stars = [];
-            for(let i = 0; i < 150; i++) {
-                stars.push({ 
-                    x: Math.random() * 1000, 
-                    y: Math.random() * 700, 
-                    size: 1 + Math.random() * 2.5,
-                    alpha: 0.3 + Math.random() * 0.7,
-                    twinkle: 0.02 + Math.random() * 0.03
-                });
-            }
-        }
-        
-        function addExplosion(x, y) {
-            for(let i = 0; i < 15; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
-                    life: 1,
-                    size: 3 + Math.random() * 5,
-                    color: `hsl(${20 + Math.random() * 30}, 80%, 60%)`
-                });
-            }
-        }
-        
-        function spawnEnemy() {
-            let x = 30 + Math.random() * (spaceCanvas.width - 60);
-            let type = Math.floor(Math.random() * 3);
-            let size = 22 + Math.random() * 10;
-            let points = 5 + Math.floor(Math.random() * 4);
-            enemies.push({ 
-                x: x, y: -30, size: size, points: points,
-                rotation: 0, rotSpeed: (Math.random() - 0.5) * 0.04,
-                type: type
-            });
-        }
-        
-        function updateSpaceGame() {
-            if(!spaceGameActive) return;
-            
-            frameCount++;
-            
-            for(let s of stars) {
-                s.y += 0.8;
-                if(s.y > 700) s.y = 0;
-            }
-            
-            for(let i = 0; i < bullets.length; i++) {
-                bullets[i].y -= 9;
-                if(bullets[i].y < 0) bullets.splice(i,1);
-            }
-            
-            for(let i = 0; i < enemies.length; i++) {
-                enemies[i].y += enemySpeed;
-                enemies[i].rotation += enemies[i].rotSpeed;
-                if(enemies[i].y > spaceCanvas.height + 60) enemies.splice(i,1);
-            }
-            
-            for(let i = 0; i < bullets.length; i++) {
-                for(let j = 0; j < enemies.length; j++) {
-                    let dx = bullets[i].x - enemies[j].x;
-                    let dy = bullets[i].y - enemies[j].y;
-                    let dist = Math.hypot(dx, dy);
-                    if(dist < enemies[j].size) {
-                        bullets.splice(i,1);
-                        enemies.splice(j,1);
-                        spaceScore += 10;
-                        document.getElementById('spaceScore').innerText = spaceScore;
-                        addExplosion(enemies[j]?.x || 0, enemies[j]?.y || 0);
-                        break;
-                    }
-                }
-            }
-            
-            for(let i = 0; i < enemies.length; i++) {
-                let dx = player.x - enemies[i].x;
-                let dy = player.y - enemies[i].y;
-                let dist = Math.hypot(dx, dy);
-                if(dist < enemies[i].size + 18) {
-                    enemies.splice(i,1);
-                    spaceLives--;
-                    document.getElementById('spaceLives').innerText = spaceLives;
-                    addExplosion(player.x, player.y);
-                    if(spaceLives <= 0) {
-                        spaceGameActive = false;
-                        document.getElementById('winnerTitle').innerText = '💥 GAME OVER 💥';
-                        document.getElementById('finalScore').innerHTML = spaceScore;
-                        document.getElementById('gameOverMsg').classList.add('show');
-                        return;
-                    }
-                }
-            }
-            
-            for(let i = 0; i < particles.length; i++) {
-                particles[i].x += particles[i].vx;
-                particles[i].y += particles[i].vy;
-                particles[i].life -= 0.03;
-                if(particles[i].life <= 0) particles.splice(i,1);
-            }
-            
-            let newLevel = Math.floor(spaceScore / 200) + 1;
-            if(newLevel > spaceLevel) {
-                spaceLevel = newLevel;
-                document.getElementById('spaceLevel').innerText = spaceLevel;
-                document.getElementById('spaceLevelBadge').innerHTML = `مرحله ${spaceLevel}`;
-                enemySpeed = 2.2 + (spaceLevel - 1) * 0.35;
-                enemySpawnRate = Math.max(22, 40 - (spaceLevel - 1) * 2.5);
-                document.getElementById('spaceStatus').innerHTML = `🚀 مرحله ${spaceLevel}! سرعت شهاب‌ها افزایش یافت! 🚀`;
-                setTimeout(() => {
-                    if(spaceGameActive) document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
-                }, 2500);
-            }
-            
-            if(frameCount % enemySpawnRate === 0 && spaceGameActive && enemies.length < 18) {
-                spawnEnemy();
-            }
-        }
-        
-        function drawSpaceGame() {
-            if(!spaceCtx) return;
-            
-            const grad = spaceCtx.createLinearGradient(0, 0, 0, spaceCanvas.height);
-            grad.addColorStop(0, "#050520");
-            grad.addColorStop(0.5, "#0a0a35");
-            grad.addColorStop(1, "#150a25");
-            spaceCtx.fillStyle = grad;
-            spaceCtx.fillRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-            
-            for(let s of stars) {
-                spaceCtx.beginPath();
-                spaceCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-                spaceCtx.fillStyle = `rgba(255, 230, 180, ${0.3 + Math.sin(Date.now() * s.twinkle) * 0.2})`;
-                spaceCtx.fill();
-            }
-            
-            for(let b of bullets) {
-                spaceCtx.fillStyle = '#ffff44';
-                spaceCtx.fillRect(b.x - 2, b.y, 4, 12);
-                spaceCtx.fillStyle = '#ffaa00';
-                spaceCtx.fillRect(b.x - 1.5, b.y + 5, 3, 10);
-            }
-            
-            for(let e of enemies) {
-                spaceCtx.save();
-                spaceCtx.translate(e.x, e.y);
-                spaceCtx.rotate(e.rotation);
-                spaceCtx.beginPath();
-                let angleStep = (Math.PI * 2) / e.points;
-                for(let i = 0; i < e.points; i++) {
-                    let angle = i * angleStep;
-                    let x1 = Math.cos(angle) * e.size;
-                    let y1 = Math.sin(angle) * e.size;
-                    if(i === 0) spaceCtx.moveTo(x1, y1);
-                    else spaceCtx.lineTo(x1, y1);
-                    let angle2 = angle + angleStep / 2;
-                    let x2 = Math.cos(angle2) * (e.size * 0.55);
-                    let y2 = Math.sin(angle2) * (e.size * 0.55);
-                    spaceCtx.lineTo(x2, y2);
-                }
-                spaceCtx.closePath();
-                const grad = spaceCtx.createRadialGradient(-5, -5, 5, 0, 0, e.size);
-                grad.addColorStop(0, "#c44");
-                grad.addColorStop(1, "#822");
-                spaceCtx.fillStyle = grad;
-                spaceCtx.fill();
-                spaceCtx.strokeStyle = "#ff8866";
-                spaceCtx.lineWidth = 1.5;
-                spaceCtx.stroke();
-                spaceCtx.restore();
-                
-                spaceCtx.beginPath();
-                spaceCtx.moveTo(e.x, e.y + e.size);
-                spaceCtx.lineTo(e.x, e.y + e.size + 10);
-                spaceCtx.strokeStyle = "rgba(255, 100, 50, 0.6)";
-                spaceCtx.lineWidth = 2;
-                spaceCtx.stroke();
-            }
-            
-            for(let p of particles) {
-                spaceCtx.fillStyle = p.color;
-                spaceCtx.beginPath();
-                spaceCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                spaceCtx.fill();
-            }
-            
-            spaceCtx.save();
-            spaceCtx.translate(player.x, player.y);
-            spaceCtx.beginPath();
-            spaceCtx.moveTo(0, -22);
-            spaceCtx.lineTo(-16, 12);
-            spaceCtx.lineTo(-8, 6);
-            spaceCtx.lineTo(-8, 18);
-            spaceCtx.lineTo(0, 12);
-            spaceCtx.lineTo(8, 18);
-            spaceCtx.lineTo(8, 6);
-            spaceCtx.lineTo(16, 12);
-            spaceCtx.closePath();
-            const shipGrad = spaceCtx.createLinearGradient(-10, -10, 10, 15);
-            shipGrad.addColorStop(0, "#5bc0ff");
-            shipGrad.addColorStop(1, "#2d7fff");
-            spaceCtx.fillStyle = shipGrad;
-            spaceCtx.fill();
-            spaceCtx.fillStyle = "#aaffdd";
-            spaceCtx.beginPath();
-            spaceCtx.moveTo(-8, -8);
-            spaceCtx.lineTo(0, -18);
-            spaceCtx.lineTo(8, -8);
-            spaceCtx.fill();
-            spaceCtx.beginPath();
-            spaceCtx.moveTo(-4, 16);
-            spaceCtx.lineTo(0, 26);
-            spaceCtx.lineTo(4, 16);
-            spaceCtx.fillStyle = "#ff8844";
-            spaceCtx.fill();
-            spaceCtx.restore();
-            
-            spaceCtx.font = "12px monospace";
-            spaceCtx.fillStyle = "rgba(180, 200, 255, 0.7)";
-            spaceCtx.fillText(`🌠 ${Math.floor(enemySpeed * 10)}%`, spaceCanvas.width - 75, 45);
-        }
-        
-        function resetSpaceGame() {
-            spaceScore = 0;
-            spaceLives = 3;
-            spaceLevel = 1;
-            spaceGameActive = true;
-            bullets = [];
-            enemies = [];
-            particles = [];
-            player.x = spaceCanvas.width / 2;
-            player.y = spaceCanvas.height - 60;
-            enemySpeed = 2.2;
-            enemySpawnRate = 40;
-            frameCount = 0;
-            document.getElementById('spaceScore').innerText = spaceScore;
-            document.getElementById('spaceLives').innerText = spaceLives;
-            document.getElementById('spaceLevel').innerText = spaceLevel;
-            document.getElementById('spaceLevelBadge').innerHTML = 'مرحله 1';
-            document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
-            startSpaceLoop();
-        }
-        
-        function startSpaceLoop() {
-            function animate() {
-                updateSpaceGame();
-                drawSpaceGame();
-                spaceAnimationId = requestAnimationFrame(animate);
-            }
-            if(spaceAnimationId) cancelAnimationFrame(spaceAnimationId);
-            animate();
-        }
-        
-        // ========== بقیه بازی‌ها (کدهای کامل قبلی) ==========
-        // نقاشی
+        // ========== نقاشی همزمان با Firebase ==========
         let paintingInitialized = false;
         let blinkInterval = null;
         let allLamps = [];
@@ -1496,29 +1240,161 @@
         let currentColor = '#000000';
         let currentSize = 6;
         let eraserMode = false;
+        let isRemoteUpdate = false;
         
         function createLightsWithBlink() { const wrapper = document.getElementById('lightsWrapper'); if(!wrapper) return; document.querySelectorAll('.light-bulb').forEach(l=>l.remove()); if(blinkInterval) clearInterval(blinkInterval); allLamps = []; const colors = ['#ff6666','#ffee66','#66ff66','#66ddff','#ff66ff','#ffaa66','#ff88cc','#88ffcc']; for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.top='-14px'; lamp.style.backgroundColor=colors[i%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<20;i++){ let lamp=document.createElement('div'); lamp.className='light-bulb'; lamp.style.left=`calc(${(i/19)*100}% - 11px)`; lamp.style.bottom='-14px'; lamp.style.backgroundColor=colors[(i+4)%colors.length]; wrapper.appendChild(lamp); allLamps.push(lamp); } for(let i=0;i<12;i++){ let l=document.createElement('div'); l.className='light-bulb'; l.style.top=`calc(${(i/11)*100}% - 13px)`; l.style.left='-14px'; l.style.backgroundColor=colors[(i+6)%colors.length]; wrapper.appendChild(l); allLamps.push(l); let r=document.createElement('div'); r.className='light-bulb'; r.style.top=`calc(${(i/11)*100}% - 13px)`; r.style.right='-14px'; r.style.backgroundColor=colors[(i+8)%colors.length]; wrapper.appendChild(r); allLamps.push(r); } let step=0; blinkInterval=setInterval(()=>{ if(document.body.classList.contains('night-mode')) return; allLamps.forEach((l,idx)=>{ if((idx+step)%2===0) l.style.opacity='1'; else l.style.opacity='0.3'; }); step=1-step; },450); }
+        
         function saveDrawingWithName() { try{ const temp=document.createElement('canvas'); temp.width=canvas.width; temp.height=canvas.height+80; const tctx=temp.getContext('2d'); tctx.fillStyle='#ffb347'; tctx.fillRect(0,0,temp.width,80); tctx.font='bold 32px "Segoe UI"'; tctx.fillStyle='#ffffff'; tctx.textAlign='center'; tctx.fillText(`✨ ${currentUserName} ✨`, temp.width/2, 48); tctx.drawImage(canvas,0,80); const link=document.createElement('a'); link.download=`نقاشی_${currentUserName}_${Date.now()}.png`; link.href=temp.toDataURL('image/png'); link.click(); return true; }catch(e){ return false; } }
+        
+        function sendDrawingData(data) {
+            if(isRemoteUpdate) return;
+            drawingRef.push(data);
+        }
+        
+        function updateBrushRemote() {
+            if(eraserMode) ctx.strokeStyle = '#FFFFFF';
+            else ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentSize;
+        }
+        
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const sx = canvas.width / rect.width;
+            const sy = canvas.height / rect.height;
+            let clientX, clientY;
+            if(e.touches) {
+                if(!e.touches.length) return null;
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            let x = (clientX - rect.left) * sx;
+            let y = (clientY - rect.top) * sy;
+            x = Math.min(Math.max(0, x), canvas.width);
+            y = Math.min(Math.max(0, y), canvas.height);
+            return { x, y };
+        }
+        
+        function startDraw(e) {
+            if(!paintingEnabled) return;
+            isDrawing = true;
+            const pos = getCoords(e);
+            if(!pos) return;
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            ctx.lineTo(pos.x+0.5, pos.y+0.5);
+            updateBrushRemote();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            sendDrawingData({ type: 'start', x: pos.x, y: pos.y, color: currentColor, size: currentSize, eraser: eraserMode });
+        }
+        
+        function drawMove(e) {
+            if(!paintingEnabled || !isDrawing) return;
+            e.preventDefault();
+            const pos = getCoords(e);
+            if(!pos) return;
+            updateBrushRemote();
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            sendDrawingData({ type: 'draw', x: pos.x, y: pos.y });
+        }
+        
+        function endDraw() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+        
         function initPaintingGame() {
             if(paintingInitialized){ createLightsWithBlink(); return; }
             paintingInitialized=true;
             canvas=document.getElementById('drawCanvas'); ctx=canvas.getContext('2d'); canvas.width=1400; canvas.height=800; ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.lineCap='round'; ctx.lineJoin='round'; createLightsWithBlink();
             document.getElementById('paintingUserName').innerHTML = currentUserName;
             document.getElementById('selectedColorDot').style.backgroundColor='#000000';
-            function getCoords(e){ const rect=canvas.getBoundingClientRect(); const sx=canvas.width/rect.width, sy=canvas.height/rect.height; let cx,cy; if(e.touches){ if(!e.touches.length) return null; cx=e.touches[0].clientX; cy=e.touches[0].clientY; }else{ cx=e.clientX; cy=e.clientY; } let x=(cx-rect.left)*sx, y=(cy-rect.top)*sy; x=Math.min(Math.max(0,x),canvas.width); y=Math.min(Math.max(0,y),canvas.height); return {x,y}; }
-            function updateBrush(){ if(eraserMode) ctx.strokeStyle='#FFFFFF'; else ctx.strokeStyle=currentColor; ctx.lineWidth=currentSize; }
-            function startDraw(e){ if(!paintingEnabled) return; isDrawing=true; const pos=getCoords(e); if(!pos) return; ctx.beginPath(); ctx.moveTo(pos.x,pos.y); ctx.lineTo(pos.x+0.5,pos.y+0.5); updateBrush(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x,pos.y); }
-            function drawMove(e){ if(!paintingEnabled||!isDrawing) return; e.preventDefault(); const pos=getCoords(e); if(!pos) return; updateBrush(); ctx.lineTo(pos.x,pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x,pos.y); }
-            function endDraw(){ isDrawing=false; ctx.beginPath(); }
-            canvas.addEventListener('mousedown',startDraw); canvas.addEventListener('mousemove',drawMove); canvas.addEventListener('mouseup',endDraw); canvas.addEventListener('mouseleave',endDraw);
-            canvas.addEventListener('touchstart',(e)=>{ e.preventDefault(); startDraw(e);}); canvas.addEventListener('touchmove',(e)=>{ e.preventDefault(); drawMove(e);}); canvas.addEventListener('touchend',endDraw);
+            
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', drawMove);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseleave', endDraw);
+            canvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); startDraw(e);});
+            canvas.addEventListener('touchmove', (e)=>{ e.preventDefault(); drawMove(e);});
+            canvas.addEventListener('touchend', endDraw);
+            
             const brushSlider=document.getElementById('brushSize'), sizeSpan=document.getElementById('sizeDisplay');
-            brushSlider.addEventListener('input',()=>{ currentSize=parseInt(brushSlider.value); sizeSpan.innerText=currentSize; updateBrush(); });
-            document.getElementById('eraserBtn').addEventListener('click',()=>{ eraserMode=true; updateBrush(); document.getElementById('toolStatus').innerHTML='🧼 پاک کن'; });
-            document.getElementById('pencilBtn').addEventListener('click',()=>{ eraserMode=false; updateBrush(); document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; });
-            document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); showMessage("بوم پاک شد!"); });
+            brushSlider.addEventListener('input',()=>{ currentSize=parseInt(brushSlider.value); sizeSpan.innerText=currentSize; updateBrushRemote(); });
+            document.getElementById('eraserBtn').addEventListener('click',()=>{ eraserMode=true; updateBrushRemote(); document.getElementById('toolStatus').innerHTML='🧼 پاک کن'; });
+            document.getElementById('pencilBtn').addEventListener('click',()=>{ eraserMode=false; updateBrushRemote(); document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; });
+            document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height); sendDrawingData({ type: 'clear' }); showMessage("بوم پاک شد!"); });
             document.getElementById('saveBtn').addEventListener('click',()=>{ if(saveDrawingWithName()) showMessage("نقاشی ذخیره شد! ✅"); else showMessage("خطا!",true); });
-            updateBrush(); document.getElementById('toolStatus').innerHTML='🎨 ابزار: قلم ● همیشه فعال';
+            
+            updateBrushRemote(); document.getElementById('toolStatus').innerHTML='🎨 ابزار: قلم ● همیشه فعال';
+            
+            // گوش دادن به تغییرات نقاشی از سایر کاربران
+            drawingRef.on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                if(!data) return;
+                isRemoteUpdate = true;
+                if(data.type === 'start') {
+                    ctx.beginPath();
+                    ctx.moveTo(data.x, data.y);
+                    if(data.eraser) ctx.strokeStyle = '#FFFFFF';
+                    else ctx.strokeStyle = data.color || '#000000';
+                    ctx.lineWidth = data.size || 6;
+                    ctx.lineTo(data.x+0.5, data.y+0.5);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(data.x, data.y);
+                } else if(data.type === 'draw') {
+                    updateBrushRemote();
+                    ctx.lineTo(data.x, data.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(data.x, data.y);
+                } else if(data.type === 'clear') {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                isRemoteUpdate = false;
+            });
+            
+            // چت همزمان
+            function addChatMessage(name, message) {
+                const chatDiv = document.getElementById('chatMessages');
+                if(chatDiv.children.length === 1 && chatDiv.children[0].innerText.includes('پیام‌ها')) {
+                    chatDiv.innerHTML = '';
+                }
+                const msgElement = document.createElement('div');
+                msgElement.className = 'chat-message';
+                msgElement.innerHTML = `<strong>${name}:</strong> <span>${message}</span>`;
+                chatDiv.appendChild(msgElement);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+                if(chatDiv.children.length > 50) chatDiv.removeChild(chatDiv.children[0]);
+            }
+            
+            chatRef.on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                if(data && data.name && data.message) {
+                    addChatMessage(data.name, data.message);
+                }
+            });
+            
+            document.getElementById('sendChatBtn').addEventListener('click', () => {
+                const input = document.getElementById('chatInput');
+                const msg = input.value.trim();
+                if(msg === '') return;
+                chatRef.push({ name: currentUserName, message: msg, timestamp: Date.now() });
+                input.value = '';
+            });
+            
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') document.getElementById('sendChatBtn').click();
+            });
+            
             const modal=document.getElementById('colorModal');
             if(!modal){
                 const newModal = document.createElement('div');
@@ -1533,8 +1409,8 @@
             const finalModal = document.getElementById('colorModal');
             document.getElementById('openColorModalBtn').addEventListener('click',()=>finalModal.classList.add('active'));
             document.getElementById('closeModalBtn').addEventListener('click',()=>finalModal.classList.remove('active'));
-            document.querySelectorAll('.modal-color').forEach(el=>{ el.addEventListener('click',()=>{ let rgb=window.getComputedStyle(el).backgroundColor.match(/\d+/g); if(rgb){ let hex="#"+((1<<24)+(parseInt(rgb[0])<<16)+(parseInt(rgb[1])<<8)+parseInt(rgb[2])).toString(16).slice(1); currentColor=hex; if(eraserMode) eraserMode=false; updateBrush(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; } finalModal.classList.remove('active'); }); });
-            document.getElementById('customColorPicker').addEventListener('input',(e)=>{ currentColor=e.target.value; if(eraserMode) eraserMode=false; updateBrush(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; finalModal.classList.remove('active'); });
+            document.querySelectorAll('.modal-color').forEach(el=>{ el.addEventListener('click',()=>{ let rgb=window.getComputedStyle(el).backgroundColor.match(/\d+/g); if(rgb){ let hex="#"+((1<<24)+(parseInt(rgb[0])<<16)+(parseInt(rgb[1])<<8)+parseInt(rgb[2])).toString(16).slice(1); currentColor=hex; if(eraserMode) eraserMode=false; updateBrushRemote(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; document.getElementById('toolStatus').innerHTML=`🎨 قلم (${currentColor})`; } finalModal.classList.remove('active'); }); });
+            document.getElementById('customColorPicker').addEventListener('input',(e)=>{ currentColor=e.target.value; if(eraserMode) eraserMode=false; updateBrushRemote(); document.getElementById('selectedColorDot').style.backgroundColor=currentColor; finalModal.classList.remove('active'); });
         }
         
         // ========== مار ==========
@@ -1685,7 +1561,7 @@
                 snakeCtx.fillText('💣', bomb.x*cellSize+8, bomb.y*cellSize+18);
             }
         }
-        function gameOverSnake() { gameRunning=false; isSnakeActive=false; if(snakeGameLoop){ clearInterval(snakeGameLoop); snakeGameLoop=null; } if(bombTimeout) clearTimeout(bombTimeout); document.getElementById('finalScore').innerHTML=score; document.getElementById('gameOverMsg').classList.add('show'); }
+        function gameOverSnake() { gameRunning=false; isSnakeActive=false; if(snakeGameLoop){ clearInterval(snakeGameLoop); snakeGameLoop=null; } if(bombTimeout) clearTimeout(bombTimeout); document.getElementById('finalScore').innerHTML=score; document.getElementById('winnerTitle').innerText='🐍 بازی مار تمام شد!'; document.getElementById('gameOverMsg').classList.add('show'); }
         
         // ========== حافظه ==========
         let memoryInitialized = false;
@@ -1762,14 +1638,12 @@
                 gameActiveFootball = false;
                 document.getElementById('winnerTitle').innerText = '🎉 شما قهرمان شدید! 🎉';
                 document.getElementById('finalScore').innerText = playerScore;
-                document.getElementById('finalCompScore').innerText = computerScore;
                 document.getElementById('gameOverMsg').classList.add('show');
                 return true;
             } else if(computerScore >= 3) {
                 gameActiveFootball = false;
                 document.getElementById('winnerTitle').innerText = '😭 حریف قهرمان شد!';
                 document.getElementById('finalScore').innerText = playerScore;
-                document.getElementById('finalCompScore').innerText = computerScore;
                 document.getElementById('gameOverMsg').classList.add('show');
                 return true;
             }
@@ -2253,6 +2127,333 @@
             animate();
         }
         
+        // ========== بازی فضایی راه شیری ==========
+        let spaceInitialized = false;
+        let spaceCanvas, spaceCtx;
+        let spaceAnimationId = null;
+        let spaceScore = 0;
+        let spaceLives = 3;
+        let spaceLevel = 1;
+        let spaceGameActive = true;
+        
+        let playerShip = { x: 500, y: 620, width: 36, height: 36 };
+        let bullets = [];
+        let enemies = [];
+        let stars = [];
+        let particles = [];
+        
+        let enemySpeed = 2.2;
+        let enemySpawnRate = 40;
+        let frameCountSpace = 0;
+        
+        function createStarsSpace() {
+            stars = [];
+            for(let i = 0; i < 150; i++) {
+                stars.push({ 
+                    x: Math.random() * 1000, 
+                    y: Math.random() * 700, 
+                    size: 1 + Math.random() * 2.5,
+                    alpha: 0.3 + Math.random() * 0.7,
+                    twinkle: 0.02 + Math.random() * 0.03
+                });
+            }
+        }
+        
+        function addExplosion(x, y) {
+            for(let i = 0; i < 15; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 1,
+                    size: 3 + Math.random() * 5,
+                    color: `hsl(${20 + Math.random() * 30}, 80%, 60%)`
+                });
+            }
+        }
+        
+        function spawnEnemy() {
+            let x = 30 + Math.random() * (spaceCanvas.width - 60);
+            let points = 5 + Math.floor(Math.random() * 4);
+            enemies.push({ 
+                x: x, y: -30, size: 22 + Math.random() * 10, points: points,
+                rotation: 0, rotSpeed: (Math.random() - 0.5) * 0.04
+            });
+        }
+        
+        function updateSpaceGame() {
+            if(!spaceGameActive) return;
+            
+            frameCountSpace++;
+            
+            for(let s of stars) {
+                s.y += 0.8;
+                if(s.y > 700) s.y = 0;
+            }
+            
+            for(let i = 0; i < bullets.length; i++) {
+                bullets[i].y -= 9;
+                if(bullets[i].y < 0) bullets.splice(i,1);
+            }
+            
+            for(let i = 0; i < enemies.length; i++) {
+                enemies[i].y += enemySpeed;
+                enemies[i].rotation += enemies[i].rotSpeed;
+                if(enemies[i].y > spaceCanvas.height + 60) enemies.splice(i,1);
+            }
+            
+            for(let i = 0; i < bullets.length; i++) {
+                for(let j = 0; j < enemies.length; j++) {
+                    let dx = bullets[i].x - enemies[j].x;
+                    let dy = bullets[i].y - enemies[j].y;
+                    let dist = Math.hypot(dx, dy);
+                    if(dist < enemies[j].size) {
+                        bullets.splice(i,1);
+                        enemies.splice(j,1);
+                        spaceScore += 10;
+                        document.getElementById('spaceScore').innerText = spaceScore;
+                        addExplosion(enemies[j]?.x || 0, enemies[j]?.y || 0);
+                        break;
+                    }
+                }
+            }
+            
+            for(let i = 0; i < enemies.length; i++) {
+                let dx = playerShip.x - enemies[i].x;
+                let dy = playerShip.y - enemies[i].y;
+                let dist = Math.hypot(dx, dy);
+                if(dist < enemies[i].size + 18) {
+                    enemies.splice(i,1);
+                    spaceLives--;
+                    document.getElementById('spaceLives').innerText = spaceLives;
+                    addExplosion(playerShip.x, playerShip.y);
+                    if(spaceLives <= 0) {
+                        spaceGameActive = false;
+                        document.getElementById('winnerTitle').innerText = '💥 GAME OVER 💥';
+                        document.getElementById('finalScore').innerHTML = spaceScore;
+                        document.getElementById('gameOverMsg').classList.add('show');
+                        return;
+                    }
+                }
+            }
+            
+            for(let i = 0; i < particles.length; i++) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life -= 0.03;
+                if(particles[i].life <= 0) particles.splice(i,1);
+            }
+            
+            let newLevel = Math.floor(spaceScore / 200) + 1;
+            if(newLevel > spaceLevel) {
+                spaceLevel = newLevel;
+                document.getElementById('spaceLevel').innerText = spaceLevel;
+                document.getElementById('spaceLevelBadge').innerHTML = `مرحله ${spaceLevel}`;
+                enemySpeed = 2.2 + (spaceLevel - 1) * 0.35;
+                enemySpawnRate = Math.max(22, 40 - (spaceLevel - 1) * 2.5);
+                document.getElementById('spaceStatus').innerHTML = `🚀 مرحله ${spaceLevel}! سرعت شهاب‌ها افزایش یافت! 🚀`;
+                setTimeout(() => {
+                    if(spaceGameActive) document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
+                }, 2500);
+            }
+            
+            if(frameCountSpace % enemySpawnRate === 0 && spaceGameActive && enemies.length < 18) {
+                spawnEnemy();
+            }
+        }
+        
+        function drawSpaceGame() {
+            if(!spaceCtx) return;
+            
+            const grad = spaceCtx.createLinearGradient(0, 0, 0, spaceCanvas.height);
+            grad.addColorStop(0, "#050520");
+            grad.addColorStop(0.5, "#0a0a35");
+            grad.addColorStop(1, "#150a25");
+            spaceCtx.fillStyle = grad;
+            spaceCtx.fillRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+            
+            for(let s of stars) {
+                spaceCtx.beginPath();
+                spaceCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                spaceCtx.fillStyle = `rgba(255, 230, 180, ${0.3 + Math.sin(Date.now() * s.twinkle) * 0.2})`;
+                spaceCtx.fill();
+            }
+            
+            for(let b of bullets) {
+                spaceCtx.fillStyle = '#ffff44';
+                spaceCtx.fillRect(b.x - 2, b.y, 4, 12);
+                spaceCtx.fillStyle = '#ffaa00';
+                spaceCtx.fillRect(b.x - 1.5, b.y + 5, 3, 10);
+            }
+            
+            for(let e of enemies) {
+                spaceCtx.save();
+                spaceCtx.translate(e.x, e.y);
+                spaceCtx.rotate(e.rotation);
+                spaceCtx.beginPath();
+                let angleStep = (Math.PI * 2) / e.points;
+                for(let i = 0; i < e.points; i++) {
+                    let angle = i * angleStep;
+                    let x1 = Math.cos(angle) * e.size;
+                    let y1 = Math.sin(angle) * e.size;
+                    if(i === 0) spaceCtx.moveTo(x1, y1);
+                    else spaceCtx.lineTo(x1, y1);
+                    let angle2 = angle + angleStep / 2;
+                    let x2 = Math.cos(angle2) * (e.size * 0.55);
+                    let y2 = Math.sin(angle2) * (e.size * 0.55);
+                    spaceCtx.lineTo(x2, y2);
+                }
+                spaceCtx.closePath();
+                const grad = spaceCtx.createRadialGradient(-5, -5, 5, 0, 0, e.size);
+                grad.addColorStop(0, "#c44");
+                grad.addColorStop(1, "#822");
+                spaceCtx.fillStyle = grad;
+                spaceCtx.fill();
+                spaceCtx.strokeStyle = "#ff8866";
+                spaceCtx.lineWidth = 1.5;
+                spaceCtx.stroke();
+                spaceCtx.restore();
+                
+                spaceCtx.beginPath();
+                spaceCtx.moveTo(e.x, e.y + e.size);
+                spaceCtx.lineTo(e.x, e.y + e.size + 10);
+                spaceCtx.strokeStyle = "rgba(255, 100, 50, 0.6)";
+                spaceCtx.lineWidth = 2;
+                spaceCtx.stroke();
+            }
+            
+            for(let p of particles) {
+                spaceCtx.fillStyle = p.color;
+                spaceCtx.beginPath();
+                spaceCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                spaceCtx.fill();
+            }
+            
+            spaceCtx.save();
+            spaceCtx.translate(playerShip.x, playerShip.y);
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(0, -22);
+            spaceCtx.lineTo(-16, 12);
+            spaceCtx.lineTo(-8, 6);
+            spaceCtx.lineTo(-8, 18);
+            spaceCtx.lineTo(0, 12);
+            spaceCtx.lineTo(8, 18);
+            spaceCtx.lineTo(8, 6);
+            spaceCtx.lineTo(16, 12);
+            spaceCtx.closePath();
+            const shipGrad = spaceCtx.createLinearGradient(-10, -10, 10, 15);
+            shipGrad.addColorStop(0, "#5bc0ff");
+            shipGrad.addColorStop(1, "#2d7fff");
+            spaceCtx.fillStyle = shipGrad;
+            spaceCtx.fill();
+            spaceCtx.fillStyle = "#aaffdd";
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(-8, -8);
+            spaceCtx.lineTo(0, -18);
+            spaceCtx.lineTo(8, -8);
+            spaceCtx.fill();
+            spaceCtx.beginPath();
+            spaceCtx.moveTo(-4, 16);
+            spaceCtx.lineTo(0, 26);
+            spaceCtx.lineTo(4, 16);
+            spaceCtx.fillStyle = "#ff8844";
+            spaceCtx.fill();
+            spaceCtx.restore();
+            
+            spaceCtx.font = "12px monospace";
+            spaceCtx.fillStyle = "rgba(180, 200, 255, 0.7)";
+            spaceCtx.fillText(`🌠 ${Math.floor(enemySpeed * 10)}%`, spaceCanvas.width - 75, 45);
+        }
+        
+        function resetSpaceGame() {
+            spaceScore = 0;
+            spaceLives = 3;
+            spaceLevel = 1;
+            spaceGameActive = true;
+            bullets = [];
+            enemies = [];
+            particles = [];
+            playerShip.x = spaceCanvas.width / 2;
+            playerShip.y = spaceCanvas.height - 60;
+            enemySpeed = 2.2;
+            enemySpawnRate = 40;
+            frameCountSpace = 0;
+            document.getElementById('spaceScore').innerText = spaceScore;
+            document.getElementById('spaceLives').innerText = spaceLives;
+            document.getElementById('spaceLevel').innerText = spaceLevel;
+            document.getElementById('spaceLevelBadge').innerHTML = 'مرحله 1';
+            document.getElementById('spaceStatus').innerHTML = "🚀 موس/انگشت رو حرکت بده - برای شلیک کلیک/لمس کن!";
+            startSpaceLoop();
+        }
+        
+        function startSpaceLoop() {
+            function animate() {
+                updateSpaceGame();
+                drawSpaceGame();
+                spaceAnimationId = requestAnimationFrame(animate);
+            }
+            if(spaceAnimationId) cancelAnimationFrame(spaceAnimationId);
+            animate();
+        }
+        
+        function initSpaceGame() {
+            if(spaceInitialized) {
+                resetSpaceGame();
+                return;
+            }
+            spaceInitialized = true;
+            spaceCanvas = document.getElementById('spaceCanvas');
+            spaceCtx = spaceCanvas.getContext('2d');
+            document.getElementById('spaceUserName').innerHTML = currentUserName;
+            
+            function getMousePos(e) {
+                const rect = spaceCanvas.getBoundingClientRect();
+                const scaleX = spaceCanvas.width / rect.width;
+                const scaleY = spaceCanvas.height / rect.height;
+                let clientX, clientY;
+                if(e.touches) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                    e.preventDefault();
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                let x = (clientX - rect.left) * scaleX;
+                let y = (clientY - rect.top) * scaleY;
+                x = Math.min(Math.max(20, x), spaceCanvas.width - 20);
+                y = Math.min(Math.max(20, y), spaceCanvas.height - 20);
+                return { x, y };
+            }
+            
+            function onPointerMove(e) {
+                if(!spaceGameActive) return;
+                const pos = getMousePos(e);
+                playerShip.x = pos.x;
+                playerShip.y = pos.y;
+            }
+            
+            function onShoot(e) {
+                if(!spaceGameActive) return;
+                bullets.push({ x: playerShip.x, y: playerShip.y - 25, width: 5, height: 15 });
+                e.preventDefault();
+            }
+            
+            spaceCanvas.addEventListener('mousemove', onPointerMove);
+            spaceCanvas.addEventListener('touchmove', onPointerMove, {passive: false});
+            spaceCanvas.addEventListener('click', onShoot);
+            spaceCanvas.addEventListener('touchstart', onShoot, {passive: false});
+            
+            document.getElementById('restartSpaceBtn').addEventListener('click', () => resetSpaceGame());
+            document.getElementById('closeGameOverBtn').addEventListener('click', () => { 
+                document.getElementById('gameOverMsg').classList.remove('show');
+                resetSpaceGame();
+            });
+            
+            createStarsSpace();
+            resetSpaceGame();
+        }
+        
         // ========== اسم فامیل ==========
         let familyTimerInterval = null;
         let familyTimeLeft = 120;
@@ -2342,6 +2543,9 @@
         document.getElementById('backFromSpaceBtn').addEventListener('click',()=>{ if(spaceAnimationId) cancelAnimationFrame(spaceAnimationId); showPage('games'); });
         document.getElementById('startFamilyGameBtn').addEventListener('click', startFamilyGame);
         document.getElementById('downloadFamilyImageBtn').addEventListener('click', downloadFamilyAsImage);
+        document.getElementById('closeGameOverBtn').addEventListener('click', () => {
+            document.getElementById('gameOverMsg').classList.remove('show');
+        });
         
         function checkLogin() {
             const name = loginNameInput.value.trim();
