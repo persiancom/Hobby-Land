@@ -87,11 +87,11 @@
             background-size: contain; background-repeat: no-repeat; height: 70px; flex: 1; max-width: 350px;
         }
         
-        /* کادر آنلاین بزرگتر با عدد قرینه وسط */
+        /* کادر آنلاین بزرگ با عدد یاسی */
         .online-box {
             position: relative;
-            width: 140px;
-            height: 58px;
+            width: 170px;
+            height: 70px;
             background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/file_00000000446871fd9d03516007d5fe16.png') no-repeat center center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -101,12 +101,12 @@
             flex-shrink: 0;
         }
         .online-count {
-            color: #ffffff;
-            font-size: 22px;
+            color: #c084fc;
+            font-size: 28px;
             font-weight: bold;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-            margin-left: 5px;
-            margin-top: -2px;
+            text-shadow: 0 0 6px rgba(0,0,0,0.4);
+            margin-left: 8px;
+            margin-top: -4px;
             letter-spacing: 1px;
         }
         
@@ -117,7 +117,7 @@
             padding: 5px 14px;
             border-radius: 25px;
             font-size: 11px;
-            color: #25d366;
+            color: #c084fc;
             display: none;
             position: fixed;
             bottom: 80px;
@@ -235,8 +235,8 @@
         
         @media (max-width: 600px) {
             .banner-area { height: 50px; max-width: 200px; }
-            .online-box { width: 115px; height: 48px; }
-            .online-count { font-size: 18px; margin-left: 3px; margin-top: 0px; }
+            .online-box { width: 140px; height: 58px; }
+            .online-count { font-size: 22px; margin-left: 5px; margin-top: -2px; }
             .message-bubble { max-width: 85%; }
             .send-btn { width: 42px; height: 42px; }
             .typing-status { bottom: 72px; font-size: 10px; padding: 4px 12px; }
@@ -313,7 +313,7 @@
     function hideContextMenu() { if(contextMenuDiv) { contextMenuDiv.remove(); contextMenuDiv = null; } }
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-    // ========== سیستم آنلاین خیلی دقیق ==========
+    // ========== سیستم آنلاین ==========
     function setUserOnline() {
         if(!currentUser) return;
         isOnline = true;
@@ -617,7 +617,6 @@
         });
     }
 
-    // ورود
     document.getElementById('loginBtn').onclick = () => {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
@@ -625,7 +624,6 @@
             currentUser = username;
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('chatPage').classList.remove('hidden');
-            
             initOnlineTracking();
             setUserOnline();
             updateOnlineUsers();
