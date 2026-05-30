@@ -131,84 +131,81 @@
             display: none !important;
         }
 
-        /* هدر سفید همرنگ بنر */
+        /* هدر سفید با بنر جدید */
         .chat-header {
             background: white;
-            padding: 10px 16px;
+            padding: 12px 16px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.08);
             flex-shrink: 0;
             position: relative;
             z-index: 2;
-            gap: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
+        /* بنر جدید - کاملاً متعادل و وسط */
         .banner-area {
-            background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B7%DB%B2%DB%B0%DB%B5%DB%B5.png') no-repeat center center;
-            background-size: cover;
-            height: 50px;
-            flex: 2;
-            max-width: 280px;
-            min-width: 180px;
-            border-radius: 25px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            margin: 0 5px;
+            background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B8%DB%B2%DB%B3%DB%B2%DB%B8.png') no-repeat center center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            height: 60px;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
+        /* وضعیت آنلاین - پایین هدر */
+        .online-status-bar {
+            background: rgba(255,255,255,0.95);
+            padding: 6px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            flex-shrink: 0;
+            z-index: 2;
+        }
+        
         .online-info {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: #f0f2f5;
-            padding: 6px 12px;
+            gap: 8px;
+            background: #075e54;
+            padding: 5px 15px;
             border-radius: 30px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #075e54;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .online-light {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #25d366;
             border-radius: 50%;
             animation: blink 1.2s infinite;
+            box-shadow: 0 0 2px #25d366;
         }
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
-
+        
         .typing-status {
-            font-size: 10px;
+            font-size: 11px;
             color: #128c7e;
             background: #dcf8c6;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
-            white-space: nowrap;
             font-weight: 500;
         }
 
-        .logout-btn {
-            background: #25d366;
-            border: none;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .logout-btn:hover {
-            background: #20b859;
-        }
-
-        /* منطقه پیام‌ها - فاصله مناسب */
+        /* منطقه پیام‌ها */
         .messages-area {
             flex: 1;
             overflow-y: auto;
@@ -362,7 +359,7 @@
             color: #ff8a7a;
         }
 
-        /* ===== منطقه تایپ پیام - حتماً نمایش داده می‌شود ===== */
+        /* ===== منطقه تایپ پیام - درست شده و حتما نمایش داده میشه ===== */
         .input-area {
             display: flex;
             padding: 12px 15px;
@@ -417,9 +414,8 @@
                 max-width: 85%;
             }
             .banner-area {
-                height: 42px;
-                max-width: 180px;
-                min-width: 120px;
+                height: 45px;
+                max-width: 220px;
             }
             .context-menu {
                 width: 85%;
@@ -428,8 +424,9 @@
             .reaction {
                 font-size: 24px;
             }
-            .online-info span {
-                font-size: 10px;
+            .online-info {
+                font-size: 11px;
+                padding: 4px 12px;
             }
             .typing-status {
                 font-size: 9px;
@@ -445,9 +442,6 @@
             .send-btn {
                 width: 42px;
                 height: 42px;
-            }
-            .chat-header {
-                padding: 8px 12px;
             }
         }
         
@@ -480,18 +474,24 @@
 
     <!-- صفحه چت -->
     <div id="chatPage" class="chat-container hidden">
+        <!-- هدر با بنر -->
         <div class="chat-header">
+            <div class="banner-area"></div>
+        </div>
+        
+        <!-- نوار وضعیت آنلاین -->
+        <div class="online-status-bar">
             <div class="online-info">
                 <div class="online-light"></div>
                 <span id="onlineUsers">0 آنلاین</span>
             </div>
-            <div class="banner-area"></div>
-            <button class="logout-btn" id="logoutBtn">خروج</button>
+            <div id="typingStatus" class="typing-status"></div>
         </div>
         
+        <!-- منطقه پیام‌ها -->
         <div class="messages-area" id="messagesArea"></div>
         
-        <!-- کادر تایپ پیام - الان حتماً دیده می‌شود -->
+        <!-- کادر تایپ پیام - الان حتماً نمایش داده میشود -->
         <div class="input-area">
             <input type="text" id="messageInput" class="message-input" placeholder="پیام خود را بنویسید...">
             <button class="send-btn" id="sendBtn"></button>
@@ -665,6 +665,7 @@
         
         function renderMessage(messageId, msg) {
             const area = document.getElementById('messagesArea');
+            if (!area) return;
             const isMy = msg.sender === currentUser;
             const wrapper = document.createElement('div');
             wrapper.className = `message-wrapper ${isMy ? 'my-message' : 'other-message'}`;
@@ -725,7 +726,8 @@
             db.ref('users').on('value', (snapshot) => {
                 let onlineCount = 0;
                 snapshot.forEach(child => { if (child.val().online) onlineCount++; });
-                document.getElementById('onlineUsers').innerHTML = `${onlineCount} آنلاین`;
+                const onlineSpan = document.getElementById('onlineUsers');
+                if (onlineSpan) onlineSpan.innerHTML = `${onlineCount} آنلاین`;
             });
         }
         
@@ -802,7 +804,6 @@
             }
         };
         
-        document.getElementById('logoutBtn').onclick = logout;
         document.getElementById('sendBtn').onclick = sendMessage;
         document.getElementById('messageInput').onkeypress = (e) => {
             if (e.key === 'Enter') sendMessage();
