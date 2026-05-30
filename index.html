@@ -87,11 +87,11 @@
             background-size: contain; background-repeat: no-repeat; height: 70px; flex: 1; max-width: 350px;
         }
         
-        /* استایل جدید برای آنلاین با عکس شما */
+        /* کادر آنلاین بزرگتر با عدد قرینه وسط */
         .online-box {
             position: relative;
-            width: 120px;
-            height: 50px;
+            width: 140px;
+            height: 58px;
             background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/file_00000000446871fd9d03516007d5fe16.png') no-repeat center center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -101,31 +101,33 @@
             flex-shrink: 0;
         }
         .online-count {
-            color: white;
-            font-size: 18px;
+            color: #ffffff;
+            font-size: 22px;
             font-weight: bold;
-            text-shadow: 0 0 4px #00000066;
-            margin-right: 18px;
-            margin-top: 4px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            margin-left: 5px;
+            margin-top: -2px;
+            letter-spacing: 1px;
         }
         
-        /* تایپینگ - بدون نوار اضافی */
+        /* تایپینگ - شناور پایین */
         .typing-status {
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(8px);
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 5px 14px;
+            border-radius: 25px;
             font-size: 11px;
             color: #25d366;
-            display: inline-block;
+            display: none;
             position: fixed;
-            bottom: 75px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 101;
             white-space: nowrap;
             font-weight: 500;
             pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         /* منطقه پیام‌ها */
@@ -232,12 +234,12 @@
         .menu-item.danger { color: #ff8a7a; }
         
         @media (max-width: 600px) {
-            .banner-area { height: 50px; max-width: 220px; }
-            .online-box { width: 100px; height: 42px; }
-            .online-count { font-size: 15px; margin-right: 14px; }
+            .banner-area { height: 50px; max-width: 200px; }
+            .online-box { width: 115px; height: 48px; }
+            .online-count { font-size: 18px; margin-left: 3px; margin-top: 0px; }
             .message-bubble { max-width: 85%; }
             .send-btn { width: 42px; height: 42px; }
-            .typing-status { bottom: 68px; font-size: 10px; white-space: nowrap; }
+            .typing-status { bottom: 72px; font-size: 10px; padding: 4px 12px; }
         }
         .messages-area::-webkit-scrollbar { width: 4px; }
         .messages-area::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
@@ -320,7 +322,6 @@
             lastSeen: firebase.database.ServerValue.TIMESTAMP,
             lastActivity: Date.now()
         });
-        // هر 30 ثانیه یکبار Activity رو آپدیت کن
         if(onlineCheckInterval) clearInterval(onlineCheckInterval);
         onlineCheckInterval = setInterval(() => {
             if(currentUser && isOnline) {
@@ -340,38 +341,15 @@
         db.ref(`typing/${currentUser}`).remove();
     }
     
-    // تشخیص قطعی نت و بستن صفحه
     function initOnlineTracking() {
-        // وقتی صفحه بسته میشه
-        window.addEventListener('beforeunload', () => {
-            setUserOffline();
-        });
-        
-        // وقتی صفحه visibility تغییر میکنه (تب عوض میشه یا صفحه قفل میشه)
+        window.addEventListener('beforeunload', () => { setUserOffline(); });
         document.addEventListener('visibilitychange', () => {
-            if(document.hidden) {
-                // صفحه مخفی شده (گوشی قفل یا تب عوض شده)
-                setUserOffline();
-            } else {
-                // برگشت به صفحه
-                setUserOnline();
-                // سریعاً وضعیت تایپ رو پاک کن
-                db.ref(`typing/${currentUser}`).remove();
-            }
+            if(document.hidden) setUserOffline();
+            else { setUserOnline(); db.ref(`typing/${currentUser}`).remove(); }
         });
+        window.addEventListener('offline', () => { setUserOffline(); });
+        window.addEventListener('online', () => { if(currentUser) setTimeout(() => setUserOnline(), 500); });
         
-        // تشخیص قطعی اینترنت
-        window.addEventListener('offline', () => {
-            setUserOffline();
-        });
-        
-        window.addEventListener('online', () => {
-            if(currentUser) {
-                setTimeout(() => setUserOnline(), 500);
-            }
-        });
-        
-        // هر 10 ثانیه یکبار بررسی کن اگه آنلاین بودی ولی activity قدیمیه، آنلاین بمون
         if(visibilityCheckInterval) clearInterval(visibilityCheckInterval);
         visibilityCheckInterval = setInterval(() => {
             if(currentUser && isOnline && !document.hidden) {
@@ -380,14 +358,12 @@
         }, 15000);
     }
     
-    // پاک کردن کاربرانی که activity قدیمی دارن (برای مواقعی که نت ناگهان قطع شده)
     function cleanStaleUsers() {
         const now = Date.now();
         db.ref('users').once('value', (snapshot) => {
             snapshot.forEach(child => {
                 const userData = child.val();
                 if(userData.online && userData.lastActivity && (now - userData.lastActivity) > 45000) {
-                    // بیشتر از 45 ثانیه activity نداشته => آفلاین کن
                     db.ref(`users/${child.key}`).update({ online: false, lastSeen: now });
                 }
             });
@@ -631,8 +607,12 @@
             snapshot.forEach(child => { if(child.key !== currentUser && child.val() === true) typingUsers.push(child.key); });
             const statusDiv = document.getElementById('typingStatus');
             if(statusDiv) {
-                statusDiv.innerHTML = typingUsers.length ? `${typingUsers.join('، ')} در حال نوشتن...` : '';
-                statusDiv.style.display = typingUsers.length ? 'inline-block' : 'none';
+                if(typingUsers.length) {
+                    statusDiv.innerHTML = `${typingUsers.join('، ')} در حال نوشتن...`;
+                    statusDiv.style.display = 'block';
+                } else {
+                    statusDiv.style.display = 'none';
+                }
             }
         });
     }
