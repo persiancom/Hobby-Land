@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>پیام‌رسان اختصاصی</title>
+    <title>پیام‌رسان Hobby Land</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             overflow: hidden;
         }
 
-        /* ================= صفحه ورود با گرادیان آبی ================= */
+        /* ================= صفحه ورود ================= */
         .login-container {
             position: fixed;
             top: 0;
@@ -41,10 +41,8 @@
             max-width: 380px;
             text-align: center;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.5);
         }
         
-        /* عکس بالای کادر ورود */
         .login-avatar {
             width: 110px;
             height: 110px;
@@ -71,7 +69,6 @@
             font-size: 16px;
             background: #f8f9fa;
             outline: none;
-            transition: 0.3s;
         }
 
         .login-box input:focus {
@@ -90,12 +87,6 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 15px;
-            transition: 0.3s;
-        }
-
-        .login-box button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(37,211,102,0.3);
         }
 
         .error-msg {
@@ -131,77 +122,66 @@
             display: none !important;
         }
 
-        /* هدر سفید با بنر جدید */
+        /* هدر با بنر و آنلاین سمت راست */
         .chat-header {
             background: white;
             padding: 12px 16px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.08);
             flex-shrink: 0;
-            position: relative;
             z-index: 2;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            gap: 12px;
         }
         
-        /* بنر جدید - کاملاً متعادل و وسط */
+        /* بنر بزرگتر */
         .banner-area {
             background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B8%DB%B2%DB%B3%DB%B2%DB%B8.png') no-repeat center center;
             background-size: contain;
             background-repeat: no-repeat;
-            height: 60px;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        /* وضعیت آنلاین - پایین هدر */
-        .online-status-bar {
-            background: rgba(255,255,255,0.95);
-            padding: 6px 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            flex-shrink: 0;
-            z-index: 2;
+            height: 70px;
+            flex: 1;
+            max-width: 350px;
         }
         
-        .online-info {
+        /* آنلاین - سمت راست بنر */
+        .online-box {
+            background: #075e54;
+            padding: 8px 16px;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #075e54;
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
-
+        
         .online-light {
             width: 10px;
             height: 10px;
             background: #25d366;
             border-radius: 50%;
             animation: blink 1.2s infinite;
-            box-shadow: 0 0 2px #25d366;
         }
-
+        
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
         
+        .online-text {
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
         .typing-status {
-            font-size: 11px;
-            color: #128c7e;
             background: #dcf8c6;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
+            font-size: 11px;
+            color: #075e54;
             font-weight: 500;
         }
 
@@ -235,9 +215,7 @@
             max-width: 78%;
             padding: 8px 12px;
             border-radius: 18px;
-            position: relative;
             cursor: pointer;
-            transition: 0.2s;
             word-wrap: break-word;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
@@ -258,9 +236,6 @@
             font-size: 10px;
             font-weight: bold;
             margin-bottom: 3px;
-        }
-        
-        .other-message .sender-name {
             color: #075e54;
         }
 
@@ -286,7 +261,47 @@
             color: #34b7f1;
         }
 
-        /* کادر منو وسط صفحه */
+        /* ===== کادر تایپ پیام - الان حتماً هست ===== */
+        .input-container {
+            display: flex;
+            padding: 12px 15px;
+            background: white;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 2;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            background: #f8f9fa;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .message-input:focus {
+            border-color: #25d366;
+            background: white;
+        }
+
+        .send-btn {
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            background-image: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B7%DB%B2%DB%B9%DB%B2%DB%B6.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        /* کادر منو */
         .context-menu {
             position: fixed;
             top: 50%;
@@ -295,23 +310,10 @@
             background: #1f2a2f;
             backdrop-filter: blur(20px);
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             z-index: 2000;
             min-width: 260px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
-            animation: fadeInScale 0.2s ease;
-        }
-        
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
         }
 
         .reaction-bar {
@@ -328,7 +330,6 @@
             font-size: 26px;
             cursor: pointer;
             padding: 4px;
-            transition: 0.15s;
         }
 
         .reaction:hover {
@@ -339,7 +340,6 @@
             padding: 12px 16px;
             cursor: pointer;
             color: #f0f0f0;
-            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -358,82 +358,17 @@
         .menu-item.danger {
             color: #ff8a7a;
         }
-
-        /* ===== منطقه تایپ پیام - درست شده و حتما نمایش داده میشه ===== */
-        .input-area {
-            display: flex;
-            padding: 12px 15px;
-            background: white;
-            gap: 12px;
-            flex-shrink: 0;
-            z-index: 2;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 12px 18px;
-            border: 1px solid #e0e0e0;
-            border-radius: 30px;
-            background: #f8f9fa;
-            color: #111;
-            outline: none;
-            font-family: inherit;
-            font-size: 14px;
-            transition: 0.2s;
-        }
         
-        .message-input:focus {
-            border-color: #25d366;
-            background: white;
-            box-shadow: 0 0 0 2px rgba(37,211,102,0.2);
-        }
-
-        .send-btn {
-            background: transparent;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            width: 48px;
-            height: 48px;
-            background-image: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B7%DB%B2%DB%B9%DB%B2%DB%B6.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            transition: 0.2s;
-        }
-        
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        /* ریسپانسیو برای گوشی */
         @media (max-width: 600px) {
-            .message-bubble {
-                max-width: 85%;
-            }
             .banner-area {
-                height: 45px;
+                height: 50px;
                 max-width: 220px;
             }
-            .context-menu {
-                width: 85%;
-                min-width: auto;
+            .online-box {
+                padding: 5px 12px;
             }
-            .reaction {
-                font-size: 24px;
-            }
-            .online-info {
+            .online-text {
                 font-size: 11px;
-                padding: 4px 12px;
-            }
-            .typing-status {
-                font-size: 9px;
-                padding: 3px 8px;
-            }
-            .input-area {
-                padding: 10px 12px;
             }
             .message-input {
                 padding: 10px 14px;
@@ -445,7 +380,6 @@
             }
         }
         
-        /* اسکرول */
         .messages-area::-webkit-scrollbar {
             width: 4px;
         }
@@ -460,11 +394,10 @@
 </head>
 <body>
 
-    <!-- صفحه ورود -->
     <div id="loginPage" class="login-container">
         <div class="login-box">
             <div class="login-avatar"></div>
-            <h2>📱 پیام‌رسان</h2>
+            <h2>📱 Hobby Land</h2>
             <input type="text" id="username" placeholder="نام کاربری">
             <input type="password" id="password" placeholder="رمز عبور">
             <button id="loginBtn">ورود</button>
@@ -472,27 +405,23 @@
         </div>
     </div>
 
-    <!-- صفحه چت -->
     <div id="chatPage" class="chat-container hidden">
-        <!-- هدر با بنر -->
         <div class="chat-header">
             <div class="banner-area"></div>
-        </div>
-        
-        <!-- نوار وضعیت آنلاین -->
-        <div class="online-status-bar">
-            <div class="online-info">
+            <div class="online-box">
                 <div class="online-light"></div>
-                <span id="onlineUsers">0 آنلاین</span>
+                <span class="online-text" id="onlineUsers">0 آنلاین</span>
             </div>
-            <div id="typingStatus" class="typing-status"></div>
         </div>
         
-        <!-- منطقه پیام‌ها -->
+        <div style="background: rgba(255,255,255,0.9); padding: 5px; text-align: center; z-index: 2;">
+            <div id="typingStatus" class="typing-status" style="display: inline-block;"></div>
+        </div>
+        
         <div class="messages-area" id="messagesArea"></div>
         
-        <!-- کادر تایپ پیام - الان حتماً نمایش داده میشود -->
-        <div class="input-area">
+        <!-- کادر تایپ پیام - اینجا هست -->
+        <div class="input-container">
             <input type="text" id="messageInput" class="message-input" placeholder="پیام خود را بنویسید...">
             <button class="send-btn" id="sendBtn"></button>
         </div>
@@ -501,7 +430,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyARAsQaZhfHHPFVBOpKmPx7u90UVrJoUuM",
             authDomain: "hobby-land-b0e00.firebaseapp.com",
@@ -514,25 +442,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // اکانت‌های مجاز
-        const validUsers = {
-            'حمیدرضا': 'CTF_22',
-            'الهه': 'CTF_11'
-        };
-
+        const validUsers = { 'حمیدرضا': 'CTF_22', 'الهه': 'CTF_11' };
         let currentUser = null;
         let contextMenuDiv = null;
 
         function hideContextMenu() {
-            if (contextMenuDiv) {
-                contextMenuDiv.remove();
-                contextMenuDiv = null;
-            }
+            if (contextMenuDiv) { contextMenuDiv.remove(); contextMenuDiv = null; }
         }
 
         function showContextMenu(message, isMyMessage) {
             hideContextMenu();
-            
             contextMenuDiv = document.createElement('div');
             contextMenuDiv.className = 'context-menu';
             
@@ -546,7 +465,7 @@
                     span.textContent = emoji;
                     span.onclick = (e) => {
                         e.stopPropagation();
-                        addReaction(message.id, emoji);
+                        db.ref(`messages/${message.id}/reactions/${currentUser}`).set(emoji);
                         hideContextMenu();
                     };
                     reactionBar.appendChild(span);
@@ -554,159 +473,118 @@
                 contextMenuDiv.appendChild(reactionBar);
             }
             
-            const copyItem = createMenuItem('📋 کپی متن', () => {
-                navigator.clipboard.writeText(message.text);
-                hideContextMenu();
-            });
+            const copyItem = document.createElement('div');
+            copyItem.className = 'menu-item';
+            copyItem.innerHTML = '📋 کپی متن';
+            copyItem.onclick = () => { navigator.clipboard.writeText(message.text); hideContextMenu(); };
             contextMenuDiv.appendChild(copyItem);
             
             if (!isMyMessage) {
-                const replyItem = createMenuItem('↩️ پاسخ', () => {
-                    document.getElementById('messageInput').value = `در پاسخ به ${message.sender}: ${message.text.substring(0, 60)}${message.text.length > 60 ? '...' : ''}\n---\n`;
+                const replyItem = document.createElement('div');
+                replyItem.className = 'menu-item';
+                replyItem.innerHTML = '↩️ پاسخ';
+                replyItem.onclick = () => {
+                    document.getElementById('messageInput').value = `در پاسخ به ${message.sender}: ${message.text.substring(0, 60)}\n---\n`;
                     document.getElementById('messageInput').focus();
                     hideContextMenu();
-                });
+                };
                 contextMenuDiv.appendChild(replyItem);
                 
-                const deleteItem = createMenuItem('🗑️ حذف پیام', () => {
-                    if (confirm('این پیام حذف شود؟')) {
-                        deleteMessage(message.id);
-                    }
-                    hideContextMenu();
-                }, true);
+                const deleteItem = document.createElement('div');
+                deleteItem.className = 'menu-item danger';
+                deleteItem.innerHTML = '🗑️ حذف پیام';
+                deleteItem.onclick = () => { if(confirm('حذف شود؟')) db.ref(`messages/${message.id}`).remove(); hideContextMenu(); };
                 contextMenuDiv.appendChild(deleteItem);
             } else {
-                const editItem = createMenuItem('✏️ ویرایش', () => {
+                const editItem = document.createElement('div');
+                editItem.className = 'menu-item';
+                editItem.innerHTML = '✏️ ویرایش';
+                editItem.onclick = () => {
                     const newText = prompt('متن جدید:', message.text);
-                    if (newText && newText.trim()) {
-                        editMessage(message.id, newText);
-                    }
+                    if(newText && newText.trim()) db.ref(`messages/${message.id}`).update({ text: newText, edited: true });
                     hideContextMenu();
-                });
+                };
                 contextMenuDiv.appendChild(editItem);
                 
-                const deleteItem = createMenuItem('🗑️ حذف این پیام', () => {
-                    if (confirm('این پیام حذف شود؟')) {
-                        deleteMessage(message.id);
-                    }
-                    hideContextMenu();
-                }, true);
+                const deleteItem = document.createElement('div');
+                deleteItem.className = 'menu-item danger';
+                deleteItem.innerHTML = '🗑️ حذف این پیام';
+                deleteItem.onclick = () => { if(confirm('حذف شود؟')) db.ref(`messages/${message.id}`).remove(); hideContextMenu(); };
                 contextMenuDiv.appendChild(deleteItem);
                 
-                const deleteAllItem = createMenuItem('🔥 حذف همه پیام‌های من', () => {
-                    if (confirm('همه پیام‌های شما حذف شود؟')) {
-                        deleteAllMyMessages();
+                const deleteAllItem = document.createElement('div');
+                deleteAllItem.className = 'menu-item danger';
+                deleteAllItem.innerHTML = '🔥 حذف همه پیام‌های من';
+                deleteAllItem.onclick = () => {
+                    if(confirm('همه پیام‌های شما حذف شود؟')) {
+                        db.ref('messages').once('value', (snapshot) => {
+                            snapshot.forEach(child => { if(child.val().sender === currentUser) db.ref(`messages/${child.key}`).remove(); });
+                        });
                     }
                     hideContextMenu();
-                }, true);
+                };
                 contextMenuDiv.appendChild(deleteAllItem);
             }
-            
             document.body.appendChild(contextMenuDiv);
-        }
-        
-        function createMenuItem(text, onClick, isDanger = false) {
-            const div = document.createElement('div');
-            div.className = 'menu-item' + (isDanger ? ' danger' : '');
-            div.innerHTML = text;
-            div.onclick = onClick;
-            return div;
-        }
-        
-        function addReaction(messageId, emoji) {
-            db.ref(`messages/${messageId}/reactions/${currentUser}`).set(emoji);
-        }
-        
-        function editMessage(messageId, newText) {
-            db.ref(`messages/${messageId}`).update({ text: newText, edited: true });
-        }
-        
-        function deleteMessage(messageId) {
-            db.ref(`messages/${messageId}`).remove();
-        }
-        
-        function deleteAllMyMessages() {
-            db.ref('messages').once('value', (snapshot) => {
-                snapshot.forEach((child) => {
-                    if (child.val().sender === currentUser) {
-                        db.ref(`messages/${child.key}`).remove();
-                    }
-                });
-            });
         }
         
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
-            if (!text || !currentUser) return;
-            db.ref('messages').push({
-                text: text,
-                sender: currentUser,
-                timestamp: Date.now(),
-                seen: false,
-                reactions: {}
-            });
+            if(!text || !currentUser) return;
+            db.ref('messages').push({ text, sender: currentUser, timestamp: Date.now(), seen: false, reactions: {} });
             input.value = '';
-            stopTyping();
+            if(window.typingTimeout) clearTimeout(window.typingTimeout);
+            db.ref(`typing/${currentUser}`).remove();
         }
         
         let typingTimeout;
         function startTyping() {
-            if (!currentUser) return;
+            if(!currentUser) return;
             db.ref(`typing/${currentUser}`).set(true);
-            if (typingTimeout) clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => stopTyping(), 1500);
-        }
-        
-        function stopTyping() {
-            if (!currentUser) return;
-            db.ref(`typing/${currentUser}`).remove();
+            if(typingTimeout) clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => { db.ref(`typing/${currentUser}`).remove(); }, 1500);
         }
         
         function renderMessage(messageId, msg) {
             const area = document.getElementById('messagesArea');
-            if (!area) return;
+            if(!area) return;
             const isMy = msg.sender === currentUser;
             const wrapper = document.createElement('div');
             wrapper.className = `message-wrapper ${isMy ? 'my-message' : 'other-message'}`;
             wrapper.dataset.messageId = messageId;
             
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            
             let reactionsHtml = '';
-            if (msg.reactions && Object.keys(msg.reactions).length > 0) {
-                const reactionList = Object.values(msg.reactions);
-                const unique = [...new Set(reactionList)];
+            if(msg.reactions && Object.keys(msg.reactions).length > 0) {
+                const unique = [...new Set(Object.values(msg.reactions))];
                 reactionsHtml = `<div style="display: flex; gap: 5px; margin-top: 5px;">${unique.map(r => `<span style="font-size: 16px;">${r}</span>`).join('')}</div>`;
             }
             
-            bubble.innerHTML = `
-                ${!isMy ? `<div class="sender-name">${msg.sender}</div>` : ''}
-                <div class="message-text">${escapeHtml(msg.text)}${msg.edited ? ' <span style="font-size: 9px;">(ویرایش)</span>' : ''}</div>
-                <div class="message-info">
-                    <span>${new Date(msg.timestamp).toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})}</span>
-                    ${isMy ? `<span class="tick ${msg.seen ? 'tick-seen' : ''}">${msg.seen ? '✓✓' : '✓'}</span>` : ''}
+            wrapper.innerHTML = `
+                <div class="message-bubble">
+                    ${!isMy ? `<div class="sender-name">${msg.sender}</div>` : ''}
+                    <div class="message-text">${escapeHtml(msg.text)}${msg.edited ? ' <span style="font-size: 9px;">(ویرایش)</span>' : ''}</div>
+                    <div class="message-info">
+                        <span>${new Date(msg.timestamp).toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})}</span>
+                        ${isMy ? `<span class="tick ${msg.seen ? 'tick-seen' : ''}">${msg.seen ? '✓✓' : '✓'}</span>` : ''}
+                    </div>
+                    ${reactionsHtml}
                 </div>
-                ${reactionsHtml}
             `;
-            wrapper.appendChild(bubble);
-            bubble.onclick = (e) => {
+            wrapper.querySelector('.message-bubble').onclick = (e) => {
                 e.stopPropagation();
                 showContextMenu({ id: messageId, text: msg.text, sender: msg.sender }, isMy);
             };
             
             let inserted = false;
-            const children = area.children;
-            for (let i = 0; i < children.length; i++) {
-                const existingId = children[i].dataset.messageId;
-                if (existingId && parseInt(existingId) < parseInt(messageId)) {
-                    area.insertBefore(wrapper, children[i]);
+            for(let i = 0; i < area.children.length; i++) {
+                if(area.children[i].dataset.messageId && parseInt(area.children[i].dataset.messageId) < parseInt(messageId)) {
+                    area.insertBefore(wrapper, area.children[i]);
                     inserted = true;
                     break;
                 }
             }
-            if (!inserted) area.appendChild(wrapper);
+            if(!inserted) area.appendChild(wrapper);
             area.scrollTop = area.scrollHeight;
         }
         
@@ -717,26 +595,23 @@
         }
         
         function setOnlineStatus(isOnline) {
-            if (!currentUser) return;
+            if(!currentUser) return;
             db.ref(`users/${currentUser}`).set({ online: isOnline, lastSeen: Date.now() });
-            if (!isOnline) stopTyping();
+            if(!isOnline) db.ref(`typing/${currentUser}`).remove();
         }
         
         function updateOnlineUsers() {
             db.ref('users').on('value', (snapshot) => {
                 let onlineCount = 0;
-                snapshot.forEach(child => { if (child.val().online) onlineCount++; });
-                const onlineSpan = document.getElementById('onlineUsers');
-                if (onlineSpan) onlineSpan.innerHTML = `${onlineCount} آنلاین`;
+                snapshot.forEach(child => { if(child.val().online) onlineCount++; });
+                document.getElementById('onlineUsers').innerHTML = `${onlineCount} آنلاین`;
             });
         }
         
         function markMessagesAsSeen() {
             db.ref('messages').orderByChild('seen').equalTo(false).once('value', (snapshot) => {
                 snapshot.forEach(child => {
-                    if (child.val().sender !== currentUser) {
-                        db.ref(`messages/${child.key}/seen`).set(true);
-                    }
+                    if(child.val().sender !== currentUser) db.ref(`messages/${child.key}/seen`).set(true);
                 });
             });
         }
@@ -748,42 +623,27 @@
             });
             db.ref('messages').on('child_changed', (snapshot) => {
                 const el = document.querySelector(`[data-message-id="${snapshot.key}"]`);
-                if (el) el.remove();
+                if(el) el.remove();
                 renderMessage(snapshot.key, snapshot.val());
             });
             db.ref('messages').on('child_removed', (snapshot) => {
                 const el = document.querySelector(`[data-message-id="${snapshot.key}"]`);
-                if (el) el.remove();
+                if(el) el.remove();
             });
         }
         
         function listenTyping() {
             db.ref('typing').on('value', (snapshot) => {
                 const typingUsers = [];
-                snapshot.forEach(child => {
-                    if (child.key !== currentUser && child.val() === true) typingUsers.push(child.key);
-                });
-                const typingSpan = document.getElementById('typingStatus');
-                if (typingSpan) {
-                    typingSpan.innerHTML = typingUsers.length ? `${typingUsers.join('، ')} در حال نوشتن...` : '';
-                }
+                snapshot.forEach(child => { if(child.key !== currentUser && child.val() === true) typingUsers.push(child.key); });
+                document.getElementById('typingStatus').innerHTML = typingUsers.length ? `${typingUsers.join('، ')} در حال نوشتن...` : '';
             });
         }
         
-        function logout() {
-            setOnlineStatus(false);
-            currentUser = null;
-            document.getElementById('chatPage').classList.add('hidden');
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        }
-        
-        // رویدادها
         document.getElementById('loginBtn').onclick = () => {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            if (validUsers[username] && validUsers[username] === password) {
+            if(validUsers[username] && validUsers[username] === password) {
                 currentUser = username;
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('chatPage').classList.remove('hidden');
@@ -793,10 +653,7 @@
                 listenTyping();
                 document.getElementById('messagesArea').innerHTML = '';
                 window.onbeforeunload = () => setOnlineStatus(false);
-                setInterval(() => {
-                    const area = document.getElementById('messagesArea');
-                    if (area) area.scrollTop = area.scrollHeight;
-                }, 600);
+                setInterval(() => { const a = document.getElementById('messagesArea'); if(a) a.scrollTop = a.scrollHeight; }, 600);
             } else {
                 const err = document.getElementById('errorMsg');
                 err.style.display = 'block';
@@ -806,10 +663,9 @@
         
         document.getElementById('sendBtn').onclick = sendMessage;
         document.getElementById('messageInput').onkeypress = (e) => {
-            if (e.key === 'Enter') sendMessage();
+            if(e.key === 'Enter') sendMessage();
             else startTyping();
         };
-        
         document.addEventListener('click', hideContextMenu);
     </script>
 </body>
