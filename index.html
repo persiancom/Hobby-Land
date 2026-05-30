@@ -3,42 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پیام‌رسان تلگرامی</title>
+    <title>پیام‌رسان اختصاصی</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
+
+        /* صفحه ورود */
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 350px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: #1e3c72;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .login-container input:focus {
+            border-color: #2a5298;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .login-container button:hover {
+            background: #1e3c72;
+        }
+
+        .error-msg {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* صفحه چت */
         .chat-container {
             width: 100%;
             max-width: 600px;
             height: 90vh;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
+
         .chat-header {
-            background: #0088cc;
+            background: #075e54;
             color: white;
             padding: 15px;
-            text-align: center;
-            font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
+        .online-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .online-light {
+            width: 10px;
+            height: 10px;
+            background-color: #25d366;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .typing-status {
+            font-size: 12px;
+            color: #25d366;
+            font-style: italic;
+        }
+
         .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -46,12 +128,8 @@
             padding: 5px 12px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
         }
-        .online-status {
-            font-size: 12px;
-            opacity: 0.9;
-        }
+
         .messages-area {
             flex: 1;
             overflow-y: auto;
@@ -60,6 +138,7 @@
             display: flex;
             flex-direction: column;
         }
+
         .message {
             max-width: 70%;
             margin-bottom: 10px;
@@ -68,31 +147,55 @@
             position: relative;
             word-wrap: break-word;
         }
-        .message-sent {
-            background: #dcf8c6;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-        .message-received {
+
+        .message-left {
             background: white;
             align-self: flex-start;
             border-bottom-left-radius: 5px;
         }
+
+        .message-right {
+            background: #dcf8c6;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
         .message-text {
             font-size: 14px;
         }
+
         .message-time {
             font-size: 10px;
             color: #666;
             margin-top: 4px;
             text-align: left;
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
         }
+
+        .tick {
+            font-size: 12px;
+        }
+
+        .tick-seen {
+            color: #34b7f1;
+        }
+
+        .sender-name {
+            font-size: 11px;
+            color: #075e54;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
         .input-area {
             display: flex;
             padding: 10px;
             background: #f0f0f0;
             gap: 10px;
         }
+
         .message-input {
             flex: 1;
             padding: 10px;
@@ -101,54 +204,40 @@
             outline: none;
             font-family: inherit;
         }
+
         .send-btn {
-            background: #0088cc;
+            background: #075e54;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
         }
-        .login-screen {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-        .google-btn {
-            background: #4285f4;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
+
         .hidden {
             display: none;
-        }
-        .status-icon {
-            font-size: 12px;
-            margin-left: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="loginScreen" class="login-screen">
-        <h2>📱 پیام‌رسان</h2>
-        <p>مثل تلگرام، اما ساده‌تر!</p>
-        <button class="google-btn" id="loginBtn">🚀 ورود با گوگل</button>
+    <!-- صفحه ورود -->
+    <div id="loginPage" class="login-container">
+        <h2>📱 ورود به پیام‌رسان</h2>
+        <input type="text" id="username" placeholder="نام کاربری">
+        <input type="password" id="password" placeholder="رمز عبور">
+        <button id="loginBtn">ورود</button>
+        <div id="errorMsg" class="error-msg">❌ رمز اشتباه است</div>
     </div>
 
-    <div id="chatContainer" class="chat-container hidden">
+    <!-- صفحه چت -->
+    <div id="chatPage" class="chat-container hidden">
         <div class="chat-header">
-            <span>💬 پیام‌رسان</span>
+            <div class="online-info">
+                <div class="online-light"></div>
+                <span id="onlineUsers">0 آنلاین</span>
+            </div>
             <div>
-                <span id="onlineCount">🟢 0 آنلاین</span>
+                <span id="typingStatus" class="typing-status"></span>
                 <button class="logout-btn" id="logoutBtn">خروج</button>
             </div>
         </div>
@@ -159,162 +248,210 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getDatabase, ref, push, onChildAdded, set, onValue, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-
-        // کانفیگ Firebase (مال شما)
-        const firebaseConfig = {
-            apiKey: "AIzaSyARAsQaZhfHHPFVBOpKmPx7u90UVrJoUuM",
-            authDomain: "hobby-land-b0e00.firebaseapp.com",
-            databaseURL: "https://hobby-land-b0e00-default-rtdb.firebaseio.com",
-            projectId: "hobby-land-b0e00",
-            storageBucket: "hobby-land-b0e00.firebasestorage.app",
-            messagingSenderId: "1001642178322",
-            appId: "1:1001642178322:web:a2ca537d1520b9b43d65cb"
+    <script>
+        // اکانت‌های مجاز
+        const validUsers = {
+            'حمیدرضا': 'CTF_22',
+            'الهه': 'CTF_11'
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
-
         let currentUser = null;
+        let messages = [];
+        let typingTimeout = null;
 
-        // عناصر DOM
-        const loginScreen = document.getElementById('loginScreen');
-        const chatContainer = document.getElementById('chatContainer');
-        const messagesArea = document.getElementById('messagesArea');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const onlineCountSpan = document.getElementById('onlineCount');
+        // دیتابیس ساده با localStorage
+        function loadMessages() {
+            const saved = localStorage.getItem('chat_messages');
+            if (saved) {
+                messages = JSON.parse(saved);
+                renderMessages();
+            }
+        }
 
-        // تابع ارسال پیام
-        async function sendMessage() {
-            const text = messageInput.value.trim();
+        function saveMessages() {
+            localStorage.setItem('chat_messages', JSON.stringify(messages));
+        }
+
+        function getOnlineUsers() {
+            const online = localStorage.getItem('online_users');
+            return online ? JSON.parse(online) : [];
+        }
+
+        function setOnlineUsers(users) {
+            localStorage.setItem('online_users', JSON.stringify(users));
+            updateOnlineDisplay();
+        }
+
+        function addOnlineUser(user) {
+            let online = getOnlineUsers();
+            if (!online.includes(user)) {
+                online.push(user);
+                setOnlineUsers(online);
+            }
+        }
+
+        function removeOnlineUser(user) {
+            let online = getOnlineUsers();
+            online = online.filter(u => u !== user);
+            setOnlineUsers(online);
+        }
+
+        function updateOnlineDisplay() {
+            const online = getOnlineUsers();
+            const count = online.length;
+            document.getElementById('onlineUsers').innerHTML = `${count} آنلاین`;
+            
+            // نمایش اسامی آنلاین
+            if (count > 0) {
+                document.getElementById('onlineUsers').title = online.join('، ');
+            }
+        }
+
+        function setTyping(user, isTyping) {
+            if (isTyping && user !== currentUser) {
+                document.getElementById('typingStatus').innerHTML = `${user} در حال نوشتن...`;
+            } else if (!isTyping) {
+                document.getElementById('typingStatus').innerHTML = '';
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
             if (!text || !currentUser) return;
 
-            const messagesRef = ref(db, 'messages');
-            await push(messagesRef, {
+            const message = {
+                id: Date.now(),
                 text: text,
-                uid: currentUser.uid,
-                name: currentUser.displayName,
-                photoURL: currentUser.photoURL,
-                timestamp: serverTimestamp(),
-                status: 'sent' // sent, delivered, seen
+                sender: currentUser,
+                timestamp: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
+                seen: false
+            };
+
+            messages.push(message);
+            saveMessages();
+            renderMessages();
+            input.value = '';
+
+            // شبیه‌سازی تیک خوردن بعد از 2 ثانیه
+            setTimeout(() => {
+                message.seen = true;
+                saveMessages();
+                renderMessages();
+            }, 2000);
+        }
+
+        function renderMessages() {
+            const area = document.getElementById('messagesArea');
+            area.innerHTML = '';
+
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.sender === currentUser ? 'message-right' : 'message-left'}`;
+
+                let senderHtml = '';
+                if (msg.sender !== currentUser) {
+                    senderHtml = `<div class="sender-name">${msg.sender}</div>`;
+                }
+
+                const tickHtml = msg.sender === currentUser 
+                    ? `<span class="tick ${msg.seen ? 'tick-seen' : ''}">${msg.seen ? '✓✓' : '✓'}</span>`
+                    : '';
+
+                div.innerHTML = `
+                    ${senderHtml}
+                    <div class="message-text">${escapeHtml(msg.text)}</div>
+                    <div class="message-time">
+                        ${msg.timestamp}
+                        ${tickHtml}
+                    </div>
+                `;
+
+                area.appendChild(div);
             });
-            messageInput.value = '';
+
+            area.scrollTop = area.scrollHeight;
         }
 
-        // تابع نمایش پیام‌ها
-        function displayMessage(data) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${data.uid === currentUser?.uid ? 'message-sent' : 'message-received'}`;
-            
-            // اسم فرستنده (فقط برای پیام‌های دریافتی)
-            let senderName = '';
-            if (data.uid !== currentUser?.uid) {
-                senderName = `<div style="font-size: 10px; color: #0088cc; margin-bottom: 3px;">${data.name || 'ناشناس'}</div>`;
-            }
-            
-            const time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('fa-IR') : 'در حال ارسال...';
-            
-            messageDiv.innerHTML = `
-                ${senderName}
-                <div class="message-text">${escapeHtml(data.text)}</div>
-                <div class="message-time">
-                    ${time}
-                    ${data.uid === currentUser?.uid ? '<span class="status-icon">✓✓</span>' : ''}
-                </div>
-            `;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-
-        // تابع برای جلوگیری از XSS
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // وضعیت آنلاین کاربران
-        function setUserStatus(userId, status) {
-            const userStatusRef = ref(db, `status/${userId}`);
-            set(userStatusRef, {
-                status: status,
-                lastSeen: serverTimestamp()
-            });
+        function handleTyping() {
+            if (!currentUser) return;
+
+            // به بقیه بگو در حال تایپ هستم
+            const otherUser = currentUser === 'حمیدرضا' ? 'الهه' : 'حمیدرضا';
+            setTyping(otherUser, false); // پاک کردن وضعیت قبلی
+            
+            if (typingTimeout) clearTimeout(typingTimeout);
+            
+            // شبیه‌سازی دریافت "در حال نوشتن" از طرف مقابل
+            setTimeout(() => {
+                if (Math.random() > 0.7) { // تصادفی برای نمونه
+                    setTyping(otherUser, true);
+                    setTimeout(() => setTyping(otherUser, false), 2000);
+                }
+            }, 500);
         }
 
-        function countOnlineUsers() {
-            const statusRef = ref(db, 'status');
-            onValue(statusRef, (snapshot) => {
-                let online = 0;
-                snapshot.forEach((child) => {
-                    const data = child.val();
-                    if (data.status === 'online') online++;
-                });
-                onlineCountSpan.innerHTML = `🟢 ${online} آنلاین`;
-            });
-        }
+        // ورود
+        document.getElementById('loginBtn').onclick = () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
 
-        // شنود پیام‌های جدید
-        function listenForMessages() {
-            const messagesRef = ref(db, 'messages');
-            onChildAdded(messagesRef, (snapshot) => {
-                const message = snapshot.val();
-                if (message && currentUser) {
-                    displayMessage(message);
+            if (validUsers[username] && validUsers[username] === password) {
+                currentUser = username;
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('chatPage').classList.remove('hidden');
+                
+                addOnlineUser(currentUser);
+                loadMessages();
+                
+                // شبیه‌سازی طرف مقابل آنلاین
+                const otherUser = currentUser === 'حمیدرضا' ? 'الهه' : 'حمیدرضا';
+                setTimeout(() => addOnlineUser(otherUser), 500);
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 2000);
+            }
+        };
+
+        // خروج
+        document.getElementById('logoutBtn').onclick = () => {
+            removeOnlineUser(currentUser);
+            currentUser = null;
+            document.getElementById('chatPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        };
+
+        // ارسال پیام
+        document.getElementById('sendBtn').onclick = sendMessage;
+        document.getElementById('messageInput').onkeypress = (e) => {
+            if (e.key === 'Enter') sendMessage();
+            else handleTyping();
+        };
+
+        // تیک سین خودکار برای پیام‌های قبلی
+        setInterval(() => {
+            let changed = false;
+            messages.forEach(msg => {
+                if (msg.sender === currentUser && !msg.seen) {
+                    msg.seen = true;
+                    changed = true;
                 }
             });
-        }
-
-        // مدیریت ورود و خروج
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                loginScreen.classList.add('hidden');
-                chatContainer.classList.remove('hidden');
-                
-                // ثبت وضعیت آنلاین
-                setUserStatus(user.uid, 'online');
-                onValue(ref(db, `status/${user.uid}`), (snapshot) => {
-                    if (!snapshot.exists()) {
-                        setUserStatus(user.uid, 'online');
-                    }
-                });
-                
-                // وقتی صفحه بسته شد، آفلاین شود
-                window.addEventListener('beforeunload', () => {
-                    setUserStatus(user.uid, 'offline');
-                });
-                
-                countOnlineUsers();
-                listenForMessages();
-            } else {
-                currentUser = null;
-                loginScreen.classList.remove('hidden');
-                chatContainer.classList.add('hidden');
-                messagesArea.innerHTML = '';
+            if (changed) {
+                saveMessages();
+                renderMessages();
             }
-        });
-
-        // رویدادها
-        loginBtn.onclick = () => signInWithPopup(auth, provider);
-        logoutBtn.onclick = () => {
-            if (currentUser) {
-                setUserStatus(currentUser.uid, 'offline');
-                signOut(auth);
-            }
-        };
-        sendBtn.onclick = sendMessage;
-        messageInput.onkeypress = (e) => {
-            if (e.key === 'Enter') sendMessage();
-        };
+        }, 3000);
     </script>
 </body>
 </html>
