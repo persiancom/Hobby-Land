@@ -86,38 +86,76 @@
             background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B5%DB%B3%DB%B0_%DB%B1%DB%B8%DB%B2%DB%B3%DB%B2%DB%B8.png') no-repeat center center;
             background-size: contain; background-repeat: no-repeat; height: 70px; flex: 1; max-width: 350px;
         }
+        
+        /* استایل جدید برای آنلاین با عکس شما */
         .online-box {
-            background: #075e54; padding: 8px 16px; border-radius: 30px; display: flex;
-            align-items: center; gap: 8px; flex-shrink: 0;
+            position: relative;
+            width: 120px;
+            height: 50px;
+            background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/file_00000000446871fd9d03516007d5fe16.png') no-repeat center center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-        .online-light { width: 10px; height: 10px; background: #25d366; border-radius: 50%; animation: blink 1.2s infinite; }
-        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .online-text { color: white; font-size: 13px; font-weight: bold; }
-
-        /* نوار تایپینگ */
-        .typing-bar {
-            background: rgba(255,255,255,0.9); padding: 5px; text-align: center; z-index: 2;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        .online-count {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 4px #00000066;
+            margin-right: 18px;
+            margin-top: 4px;
         }
-        .typing-status { background: #dcf8c6; padding: 4px 12px; border-radius: 20px; font-size: 11px; color: #075e54; display: inline-block; }
+        
+        /* تایپینگ - بدون نوار اضافی */
+        .typing-status {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #25d366;
+            display: inline-block;
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+            white-space: nowrap;
+            font-weight: 500;
+            pointer-events: none;
+        }
 
         /* منطقه پیام‌ها */
         .messages-area {
-            flex: 1; overflow-y: auto; padding: 15px 12px; display: flex; flex-direction: column;
-            gap: 8px; z-index: 1; position: relative; padding-bottom: 120px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1;
+            position: relative;
+            padding-bottom: 85px;
         }
         
-        /* مدل پیام برعکس: خودم راست، بقیه چپ */
+        /* مدل پیام */
         .message-wrapper { display: flex; width: 100%; margin-bottom: 4px; }
         .message-wrapper.my-message { justify-content: flex-end; }
         .message-wrapper.other-message { justify-content: flex-start; }
         
         .message-bubble {
-            max-width: 78%; padding: 8px 12px; border-radius: 18px; cursor: pointer;
-            word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            max-width: 78%;
+            padding: 8px 12px;
+            border-radius: 18px;
+            cursor: pointer;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             position: relative;
         }
-        /* پیام من: آبی کم رنگ مثل تلگرام */
+        /* پیام من: آبی کم رنگ */
         .my-message .message-bubble {
             background: rgba(0, 132, 255, 0.85);
             color: white;
@@ -139,7 +177,7 @@
         .other-message .message-info { color: #777; }
         .tick-seen { color: #34b7f1; }
         
-        /* استایل ریپلای داخل پیام */
+        /* ریپلای داخل پیام */
         .reply-preview {
             background: rgba(0,0,0,0.08); border-radius: 12px; padding: 5px 8px; margin-bottom: 6px;
             border-right: 3px solid #25d366; font-size: 11px;
@@ -148,7 +186,7 @@
         .reply-sender { font-weight: bold; font-size: 10px; }
         .reply-text { font-size: 10px; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* کادر ریپلای در حال تایپ (بالای اینپوت) */
+        /* کادر ریپلای در حال تایپ */
         .replying-box {
             background: #e8f5e9; padding: 8px 12px; margin: 0 12px 8px 12px; border-radius: 16px;
             display: flex; justify-content: space-between; align-items: center;
@@ -195,9 +233,11 @@
         
         @media (max-width: 600px) {
             .banner-area { height: 50px; max-width: 220px; }
-            .online-box { padding: 5px 12px; }
+            .online-box { width: 100px; height: 42px; }
+            .online-count { font-size: 15px; margin-right: 14px; }
             .message-bubble { max-width: 85%; }
             .send-btn { width: 42px; height: 42px; }
+            .typing-status { bottom: 68px; font-size: 10px; white-space: nowrap; }
         }
         .messages-area::-webkit-scrollbar { width: 4px; }
         .messages-area::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
@@ -221,19 +261,13 @@
     <div class="chat-header">
         <div class="banner-area"></div>
         <div class="online-box">
-            <div class="online-light"></div>
-            <span class="online-text" id="onlineUsers">0 آنلاین</span>
+            <span class="online-count" id="onlineUsers">0</span>
         </div>
-    </div>
-    
-    <div class="typing-bar">
-        <div id="typingStatus" class="typing-status"></div>
     </div>
     
     <div class="messages-area" id="messagesArea"></div>
     
     <div class="input-container">
-        <!-- کادر نمایش ریپلای در حال تایپ -->
         <div id="replyingIndicator" style="display: none;" class="replying-box">
             <div>
                 <span style="font-weight: bold;">در پاسخ به <span id="replyToName"></span></span>
@@ -247,6 +281,8 @@
         </div>
     </div>
 </div>
+
+<div id="typingStatus" class="typing-status"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -266,14 +302,98 @@
     const validUsers = { 'حمیدرضا': 'CTF_22', 'الهه': 'CTF_11' };
     let currentUser = null;
     let contextMenuDiv = null;
-    
-    // ادیت: متغیر برای نگهداری پیام در حال ویرایش
     let editingMessageId = null;
-    // ریپلای: متغیر برای نگهداری پیام در حال پاسخ
     let replyingTo = null;
+    let onlineCheckInterval = null;
+    let isOnline = false;
+    let visibilityCheckInterval = null;
 
     function hideContextMenu() { if(contextMenuDiv) { contextMenuDiv.remove(); contextMenuDiv = null; } }
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+    // ========== سیستم آنلاین خیلی دقیق ==========
+    function setUserOnline() {
+        if(!currentUser) return;
+        isOnline = true;
+        db.ref(`users/${currentUser}`).set({
+            online: true,
+            lastSeen: firebase.database.ServerValue.TIMESTAMP,
+            lastActivity: Date.now()
+        });
+        // هر 30 ثانیه یکبار Activity رو آپدیت کن
+        if(onlineCheckInterval) clearInterval(onlineCheckInterval);
+        onlineCheckInterval = setInterval(() => {
+            if(currentUser && isOnline) {
+                db.ref(`users/${currentUser}/lastActivity`).set(Date.now());
+            }
+        }, 25000);
+    }
+    
+    function setUserOffline() {
+        if(!currentUser) return;
+        isOnline = false;
+        if(onlineCheckInterval) clearInterval(onlineCheckInterval);
+        db.ref(`users/${currentUser}`).update({
+            online: false,
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+        });
+        db.ref(`typing/${currentUser}`).remove();
+    }
+    
+    // تشخیص قطعی نت و بستن صفحه
+    function initOnlineTracking() {
+        // وقتی صفحه بسته میشه
+        window.addEventListener('beforeunload', () => {
+            setUserOffline();
+        });
+        
+        // وقتی صفحه visibility تغییر میکنه (تب عوض میشه یا صفحه قفل میشه)
+        document.addEventListener('visibilitychange', () => {
+            if(document.hidden) {
+                // صفحه مخفی شده (گوشی قفل یا تب عوض شده)
+                setUserOffline();
+            } else {
+                // برگشت به صفحه
+                setUserOnline();
+                // سریعاً وضعیت تایپ رو پاک کن
+                db.ref(`typing/${currentUser}`).remove();
+            }
+        });
+        
+        // تشخیص قطعی اینترنت
+        window.addEventListener('offline', () => {
+            setUserOffline();
+        });
+        
+        window.addEventListener('online', () => {
+            if(currentUser) {
+                setTimeout(() => setUserOnline(), 500);
+            }
+        });
+        
+        // هر 10 ثانیه یکبار بررسی کن اگه آنلاین بودی ولی activity قدیمیه، آنلاین بمون
+        if(visibilityCheckInterval) clearInterval(visibilityCheckInterval);
+        visibilityCheckInterval = setInterval(() => {
+            if(currentUser && isOnline && !document.hidden) {
+                db.ref(`users/${currentUser}/lastActivity`).set(Date.now());
+            }
+        }, 15000);
+    }
+    
+    // پاک کردن کاربرانی که activity قدیمی دارن (برای مواقعی که نت ناگهان قطع شده)
+    function cleanStaleUsers() {
+        const now = Date.now();
+        db.ref('users').once('value', (snapshot) => {
+            snapshot.forEach(child => {
+                const userData = child.val();
+                if(userData.online && userData.lastActivity && (now - userData.lastActivity) > 45000) {
+                    // بیشتر از 45 ثانیه activity نداشته => آفلاین کن
+                    db.ref(`users/${child.key}`).update({ online: false, lastSeen: now });
+                }
+            });
+        });
+    }
+    setInterval(() => cleanStaleUsers(), 20000);
 
     function showContextMenu(message, isMyMessage) {
         hideContextMenu();
@@ -324,7 +444,6 @@
             editItem.className = 'menu-item';
             editItem.innerHTML = '✏️ ویرایش';
             editItem.onclick = () => {
-                // ادیت: متن پیام بره توی کادر تایپ
                 editingMessageId = message.id;
                 document.getElementById('messageInput').value = message.text;
                 document.getElementById('messageInput').focus();
@@ -354,7 +473,6 @@
         document.body.appendChild(contextMenuDiv);
     }
 
-    // شروع ریپلای
     function startReply(messageId, senderName, messageText) {
         replyingTo = { id: messageId, sender: senderName, text: messageText };
         const indicator = document.getElementById('replyingIndicator');
@@ -369,14 +487,12 @@
         document.getElementById('replyingIndicator').style.display = 'none';
     }
     
-    // ارسال یا ادیت پیام
     function sendOrEditMessage() {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if(!text || !currentUser) return;
         
         if(editingMessageId) {
-            // حالت ویرایش
             db.ref(`messages/${editingMessageId}`).update({
                 text: text,
                 edited: true
@@ -388,7 +504,6 @@
             return;
         }
         
-        // حالت ارسال معمولی با ریپلای
         const messageData = {
             text: text,
             sender: currentUser,
@@ -458,7 +573,6 @@
             showContextMenu({ id: messageId, text: msg.text, sender: msg.sender }, isMy);
         };
         
-        // مرتب‌سازی بر اساس timestamp
         let inserted = false;
         for(let i = 0; i < area.children.length; i++) {
             const childId = area.children[i].dataset.messageId;
@@ -472,17 +586,16 @@
         area.scrollTop = area.scrollHeight;
     }
 
-    function setOnlineStatus(isOnline) {
-        if(!currentUser) return;
-        db.ref(`users/${currentUser}`).set({ online: isOnline, lastSeen: Date.now() });
-        if(!isOnline) db.ref(`typing/${currentUser}`).remove();
-    }
-
     function updateOnlineUsers() {
         db.ref('users').on('value', (snapshot) => {
             let onlineCount = 0;
-            snapshot.forEach(child => { if(child.val().online) onlineCount++; });
-            document.getElementById('onlineUsers').innerHTML = `${onlineCount} آنلاین`;
+            snapshot.forEach(child => { 
+                const userData = child.val();
+                if(userData.online === true && child.key !== currentUser) onlineCount++;
+                if(userData.online === true && child.key === currentUser) onlineCount++;
+            });
+            const countSpan = document.getElementById('onlineUsers');
+            if(countSpan) countSpan.innerHTML = onlineCount;
         });
     }
 
@@ -517,7 +630,10 @@
             const typingUsers = [];
             snapshot.forEach(child => { if(child.key !== currentUser && child.val() === true) typingUsers.push(child.key); });
             const statusDiv = document.getElementById('typingStatus');
-            statusDiv.innerHTML = typingUsers.length ? `${typingUsers.join('، ')} در حال نوشتن...` : '';
+            if(statusDiv) {
+                statusDiv.innerHTML = typingUsers.length ? `${typingUsers.join('، ')} در حال نوشتن...` : '';
+                statusDiv.style.display = typingUsers.length ? 'inline-block' : 'none';
+            }
         });
     }
 
@@ -529,13 +645,13 @@
             currentUser = username;
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('chatPage').classList.remove('hidden');
-            setOnlineStatus(true);
+            
+            initOnlineTracking();
+            setUserOnline();
             updateOnlineUsers();
             listenMessages();
             listenTyping();
             document.getElementById('messagesArea').innerHTML = '';
-            window.onbeforeunload = () => setOnlineStatus(false);
-            setInterval(() => { const a = document.getElementById('messagesArea'); if(a) a.scrollTop = a.scrollHeight; }, 600);
         } else {
             const err = document.getElementById('errorMsg');
             err.style.display = 'block';
