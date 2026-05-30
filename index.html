@@ -149,13 +149,15 @@
             letter-spacing: 1px;
         }
         
-        .typing-dots {
+        /* انیمیشن سه نقطه برای در حال نوشتن */
+        .typing-indicator {
             display: none;
             align-items: center;
-            gap: 4px;
-            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(12px);
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: 40px;
             position: fixed;
             bottom: 85px;
@@ -165,17 +167,17 @@
             border: 1px solid rgba(192, 132, 252, 0.5);
             box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
         }
-        .typing-dots span {
+        .typing-indicator .dot {
             width: 8px;
             height: 8px;
             background: #c084fc;
             border-radius: 50%;
             display: inline-block;
-            animation: typing 1.4s infinite ease-in-out both;
+            animation: typingWave 1.4s infinite ease-in-out both;
         }
-        .typing-dots span:nth-child(2) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(3) { animation-delay: -0.16s; }
-        @keyframes typing {
+        .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingWave {
             0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
             40% { transform: scale(1.1); opacity: 1; }
         }
@@ -186,6 +188,7 @@
             font-weight: 500;
         }
 
+        /* منطقه پیام‌ها - با فضای خالی کافی که پیام زیر کادر نره */
         .messages-area {
             flex: 1;
             overflow-y: auto;
@@ -196,6 +199,11 @@
             z-index: 1;
             position: relative;
             padding-bottom: 100px;
+        }
+        
+        /* اسکرول خودکار به پایین */
+        .messages-area {
+            scroll-behavior: smooth;
         }
         
         .message-wrapper { display: flex; width: 100%; margin-bottom: 4px; }
@@ -231,7 +239,7 @@
         .other-message .message-info { color: #777; }
         .tick-seen { color: #34b7f1; }
         
-        /* پیام سیستم (هشدار اسکرین شات) */
+        /* پیام سیستم */
         .system-message {
             text-align: center;
             font-size: 11px;
@@ -320,7 +328,7 @@
             .online-count { font-size: 18px; margin-left: 8px; margin-top: -4px; }
             .message-bubble { max-width: 85%; }
             .send-btn { width: 42px; height: 42px; }
-            .typing-dots { bottom: 72px; padding: 6px 14px; }
+            .typing-indicator { bottom: 72px; padding: 6px 14px; }
             .messages-area { padding-bottom: 85px; }
             .login-logo { width: 130px; height: 130px; margin-top: -75px; }
         }
@@ -367,9 +375,12 @@
     </div>
 </div>
 
-<div id="typingIndicator" class="typing-dots">
+<!-- نشانگر در حال نوشتن -->
+<div id="typingIndicator" class="typing-indicator">
     <span class="typing-text">در حال نوشتن</span>
-    <span></span><span></span><span></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -400,6 +411,14 @@
     function hideContextMenu() { if(contextMenuDiv) { contextMenuDiv.remove(); contextMenuDiv = null; } }
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
+    // اسکرول به پایین (با رعایت فاصله از کادر تایپ)
+    function scrollToBottom() {
+        const messagesArea = document.getElementById('messagesArea');
+        if(messagesArea) {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+    }
+
     // ========== تشخیص اسکرین شات ==========
     function initScreenshotDetection() {
         let lastHiddenTime = null;
@@ -414,11 +433,9 @@
             
             if (!document.hidden && lastHiddenTime !== null) {
                 const hiddenDuration = Date.now() - lastHiddenTime;
-                // اگه صفحه بین 100 تا 800 میلی ثانیه مخفی بوده => احتمال اسکرین شات
                 if (hiddenDuration > 80 && hiddenDuration < 800 && !warnedRecently) {
                     warnedRecently = true;
                     
-                    // ارسال پیام هشدار به چت
                     const warningText = `⚠️ ${currentUser} از چت اسکرین شات گرفت!`;
                     db.ref('messages').push({
                         text: warningText,
@@ -429,7 +446,6 @@
                         isSystemMessage: true
                     });
                     
-                    // اعلان به خود کاربر
                     setTimeout(() => {
                         alert('⚠️ اسکرین شات گرفته شد و در چت ثبت گردید!');
                     }, 100);
@@ -650,13 +666,13 @@
         const area = document.getElementById('messagesArea');
         if(!area) return;
         
-        // پیام سیستم (هشدار اسکرین شات)
+        // پیام سیستم
         if(msg.sender === 'سیستم') {
             const wrapper = document.createElement('div');
             wrapper.className = 'system-wrapper';
             wrapper.innerHTML = `<div class="system-message">⚠️ ${escapeHtml(msg.text)}</div>`;
             area.appendChild(wrapper);
-            area.scrollTop = area.scrollHeight;
+            scrollToBottom();
             return;
         }
         
@@ -743,7 +759,7 @@
             }
         }
         if(!inserted) area.appendChild(wrapper);
-        area.scrollTop = area.scrollHeight;
+        scrollToBottom();
     }
 
     function updateOnlineUsers() {
@@ -782,6 +798,7 @@
         });
     }
 
+    // ========== تشخیص در حال نوشتن (تایپینگ) ==========
     function listenTyping() {
         db.ref('typing').on('value', (snapshot) => {
             let isSomeoneTyping = false;
@@ -810,7 +827,7 @@
             updateOnlineUsers();
             listenMessages();
             listenTyping();
-            initScreenshotDetection(); // فعال کردن تشخیص اسکرین شات
+            initScreenshotDetection();
             document.getElementById('messagesArea').innerHTML = '';
         } else {
             const err = document.getElementById('errorMsg');
