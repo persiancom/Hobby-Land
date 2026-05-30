@@ -18,7 +18,7 @@
             overflow: hidden;
         }
 
-        /* ================= صفحه ورود ================= */
+        /* صفحه ورود */
         .login-container {
             position: fixed;
             top: 0;
@@ -56,7 +56,6 @@
             z-index: 1;
         }
 
-        /* لوگو بدون حاشیه */
         .login-logo {
             width: 150px;
             height: 150px;
@@ -93,7 +92,7 @@
         }
         .error-msg { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; }
 
-        /* ================= صفحه چت ================= */
+        /* صفحه چت */
         .chat-container {
             width: 100%; height: 100vh; display: flex; flex-direction: column;
             background: url('https://raw.githubusercontent.com/persiancom/Hobby-Land/main/file_00000000640c71f88b100e7f56cbb09d.png?raw=true') no-repeat center center fixed;
@@ -231,6 +230,25 @@
         .my-message .message-info { color: #d0eaff; }
         .other-message .message-info { color: #777; }
         .tick-seen { color: #34b7f1; }
+        
+        /* پیام سیستم (هشدار اسکرین شات) */
+        .system-message {
+            text-align: center;
+            font-size: 11px;
+            color: #ff6b6b;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 5px auto;
+            display: inline-block;
+            width: auto;
+            backdrop-filter: blur(4px);
+        }
+        .system-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
         
         .reply-preview {
             background: rgba(0,0,0,0.08); border-radius: 12px; padding: 5px 8px; margin-bottom: 6px;
@@ -377,10 +395,56 @@
     let isOnline = false;
     let onlineRef = null;
     let typingCheckInterval = null;
+    let screenshotInterval = null;
 
     function hideContextMenu() { if(contextMenuDiv) { contextMenuDiv.remove(); contextMenuDiv = null; } }
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
+    // ========== تشخیص اسکرین شات ==========
+    function initScreenshotDetection() {
+        let lastHiddenTime = null;
+        let warnedRecently = false;
+        
+        function detectScreenshot() {
+            if (!currentUser) return;
+            
+            if (document.hidden) {
+                lastHiddenTime = Date.now();
+            }
+            
+            if (!document.hidden && lastHiddenTime !== null) {
+                const hiddenDuration = Date.now() - lastHiddenTime;
+                // اگه صفحه بین 100 تا 800 میلی ثانیه مخفی بوده => احتمال اسکرین شات
+                if (hiddenDuration > 80 && hiddenDuration < 800 && !warnedRecently) {
+                    warnedRecently = true;
+                    
+                    // ارسال پیام هشدار به چت
+                    const warningText = `⚠️ ${currentUser} از چت اسکرین شات گرفت!`;
+                    db.ref('messages').push({
+                        text: warningText,
+                        sender: 'سیستم',
+                        timestamp: Date.now(),
+                        seen: false,
+                        reactions: {},
+                        isSystemMessage: true
+                    });
+                    
+                    // اعلان به خود کاربر
+                    setTimeout(() => {
+                        alert('⚠️ اسکرین شات گرفته شد و در چت ثبت گردید!');
+                    }, 100);
+                    
+                    setTimeout(() => { warnedRecently = false; }, 3000);
+                }
+                lastHiddenTime = null;
+            }
+        }
+        
+        if (screenshotInterval) clearInterval(screenshotInterval);
+        screenshotInterval = setInterval(detectScreenshot, 300);
+    }
+
+    // ========== سیستم آنلاین ==========
     function setUserOnline() {
         if(!currentUser) return;
         isOnline = true;
@@ -586,6 +650,16 @@
         const area = document.getElementById('messagesArea');
         if(!area) return;
         
+        // پیام سیستم (هشدار اسکرین شات)
+        if(msg.sender === 'سیستم') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'system-wrapper';
+            wrapper.innerHTML = `<div class="system-message">⚠️ ${escapeHtml(msg.text)}</div>`;
+            area.appendChild(wrapper);
+            area.scrollTop = area.scrollHeight;
+            return;
+        }
+        
         const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
         if(existingMsg) {
             const bubble = existingMsg.querySelector('.message-bubble');
@@ -723,6 +797,7 @@
         });
     }
 
+    // ورود
     document.getElementById('loginBtn').onclick = () => {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
@@ -735,6 +810,7 @@
             updateOnlineUsers();
             listenMessages();
             listenTyping();
+            initScreenshotDetection(); // فعال کردن تشخیص اسکرین شات
             document.getElementById('messagesArea').innerHTML = '';
         } else {
             const err = document.getElementById('errorMsg');
